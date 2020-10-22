@@ -5,6 +5,9 @@ import { darkTheme, lightTheme } from './themes'
 import { GlobalStyles } from './globalStyles'
 
 import { useDarkMode } from './hooks/useDarkMode'
+import { Route, Switch } from 'wouter'
+import Home from './pages/Home'
+import OrderControl from './pages/OrderControl'
 
 function App() {
   const [theme] = useDarkMode()
@@ -13,9 +16,10 @@ function App() {
   return (
     <ThemeProvider theme={themeMode}>
       <GlobalStyles />
-      <div>
-        Hola mundo
-      </div>
+      <Switch>
+        <Route path='/' component={Home} />
+        <Route path='/orderControl' component={OrderControl} />
+      </Switch>
     </ThemeProvider>
   );
 }
