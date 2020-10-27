@@ -136,7 +136,7 @@ function Order() {
 
   return (
     <Container maxWidth='xs'>
-      <AppBar position='sticky' color='transparent' variant='outlined' style={{ borderBottom: '2px solid rgba(0, 0, 0, 0.12)', borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
+      <AppBar position='sticky' variant='outlined' style={{ backgroundColor: 'white', borderBottom: '2px solid rgba(0, 0, 0, 0.12)', borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
         <Toolbar style={ { color: 'black' } }>
           <Grid container direction='row' justify='space-between' alignItems='center'>
             <Grid item>
