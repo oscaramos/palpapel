@@ -1,15 +1,15 @@
 import React from 'react'
-import styled from 'styled-components'
+import { Button } from '@material-ui/core'
 
-const Container = styled.div`
-  
-`
 
 function Home() {
   return (
-    <Container>
+    <div>
+      <Button>
+        aa
+      </Button>
       Home
-    </Container>
+    </div>
   )
 }
 
