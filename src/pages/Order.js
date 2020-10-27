@@ -1,5 +1,6 @@
 import React from 'react'
 import { TemplateHandler } from 'easy-template-x'
+import { Link } from 'wouter'
 
 import {
   Grid,
@@ -16,6 +17,8 @@ import PrintIcon from '@material-ui/icons/Print'
 import ShareIcon from '@material-ui/icons/Share'
 
 import makeStyles from '@material-ui/core/styles/makeStyles'
+import { useOrders } from '../hooks/useOrders'
+import { toDDMMYYYY } from '../utils'
 
 const saveFile = (filename, blob) => {
   // see: https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
@@ -114,21 +117,11 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-
-function Order() {
+function Order({ params }) {
+  const { id } = params
+  const [orders] = useOrders()
   const classes = useStyles()
-  const data = {
-    orderNumber: '000104',
-    orderDate: new Date(),
-    schoolName: 'Colegio de las rosas',
-    schoolAddress: '2972 Westheimer Rd. Santa Ana, Illinois 85486 ',
-    schoolRUC: '20601888221',
-    schoolTelephone: '211425',
-    schoolCellphone: '921492405',
-    responsableName: 'Bessie Cooper',
-    responsablePosition: 'Teacher',
-    responsableEmail: 'tim.jennings@example.com',
-  }
+  const data = orders[id]
 
   const handleClickDownload = () => {
     downloadFile(toDocumentData(data))
@@ -137,27 +130,29 @@ function Order() {
   return (
     <Container maxWidth='xs'>
       <AppBar position='sticky' variant='outlined' style={{ backgroundColor: 'white', borderBottom: '2px solid rgba(0, 0, 0, 0.12)', borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
-        <Toolbar style={ { color: 'black' } }>
+        <Toolbar style={ { color: 'black' } } disableGutters>
           <Grid container direction='row' justify='space-between' alignItems='center'>
             <Grid item>
-              <IconButton>
-                <ArrowBackIcon />
-              </IconButton>
+              <Link href='/'>
+                <IconButton>
+                  <ArrowBackIcon />
+                </IconButton>
+              </Link>
             </Grid>
             <Grid item>
               <Typography variant='h5' align='center'>
                 Nº { data.orderNumber }
               </Typography>
               <Typography variant='h6' align='center'>
-                { data.orderDate.getDay() }/{ data.orderDate.getMonth() }/{ data.orderDate.getFullYear() }
+                { toDDMMYYYY(data.orderDate) }
               </Typography>
             </Grid>
             <Grid item>
               <IconButton style={ { position: 'absolute', marginLeft: '-2.5rem' } }>
                 <ShareIcon />
               </IconButton>
-              <IconButton>
-                <PrintIcon onClick={ handleClickDownload } />
+              <IconButton onClick={ handleClickDownload }>
+                <PrintIcon />
               </IconButton>
             </Grid>
           </Grid>

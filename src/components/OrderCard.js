@@ -17,10 +17,10 @@ const useStyles = makeStyles(() => ({
 }))
 
 
-function OrderCard({ orderNumber, orderDate, responsableName }) {
+function OrderCard({ id, orderNumber, orderDate, responsableName }) {
   const classes = useStyles()
   return (
-    <Link href='/order'>
+    <Link href={ `/order/${ id }` }>
       <Card className={ classes.cardContainer }>
         <CardContent style={ { padding: 12 } }>
           <Grid container direction='column'>

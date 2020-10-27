@@ -14,9 +14,13 @@ import {
 import SearchIcon from '@material-ui/icons/Search'
 
 import OrderCard from '../components/OrderCard'
+import { useOrders } from '../hooks/useOrders'
+import { toDDMMYYYY } from '../utils'
 
 
 function Home() {
+  const [orders] = useOrders()
+
   return (
     <Container maxWidth='xs'>
       <AppBar position='sticky' variant='outlined' style={ { border: 'none', backgroundColor: 'white' } }>
@@ -45,28 +49,20 @@ function Home() {
             My orders
           </Typography>
 
-          <Grid container direction='column' spacing='1' style={ { marginTop: '0.5rem', marginBottom: '0.5rem' } }>
-            <Grid item>
-              <OrderCard
-                responsableName='Responsable Name'
-                orderNumber='000104'
-                orderDate='01/01/2020'
-              />
-            </Grid>
-            <Grid item>
-              <OrderCard
-                responsableName='Responsable Name'
-                orderNumber='000104'
-                orderDate='01/01/2020'
-              />
-            </Grid>
-            <Grid item>
-              <OrderCard
-                responsableName='Responsable Name'
-                orderNumber='000104'
-                orderDate='01/01/2020'
-              />
-            </Grid>
+          <Grid container direction='column' spacing={1} style={ { marginTop: '0.5rem', marginBottom: '0.5rem' } }>
+            {
+              orders.map(order => (
+                <Grid item key={ order.id }>
+                  <OrderCard
+                    id={order.id}
+                    responsableName={order.responsableName}
+                    orderNumber={order.orderNumber}
+                    orderDate={toDDMMYYYY(order.orderDate)}
+                  />
+                </Grid>
+              ))
+            }
+
           </Grid>
 
           <Button variant='outlined' fullWidth>
@@ -79,7 +75,7 @@ function Home() {
             Shared With Me
           </Typography>
 
-          <Grid container direction='column' spacing='1' style={ { marginTop: '0.5rem', marginBottom: '0.5rem' } }>
+          <Grid container direction='column' spacing={1} style={ { marginTop: '0.5rem', marginBottom: '0.5rem' } }>
             <Grid item>
               <OrderCard
                 responsableName='Responsable Name'
