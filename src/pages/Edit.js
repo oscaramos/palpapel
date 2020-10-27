@@ -52,7 +52,7 @@ function Edit() {
           container
           direction='column'
           style={ { marginTop: '1rem', marginBottom: '1rem' } }
-          spacing='1'
+          spacing={1}
         >
           <Grid item>
             <Typography variant='h2'>
@@ -82,7 +82,7 @@ function Edit() {
           container
           direction='column'
           style={ { marginTop: '1rem', marginBottom: '1rem' } }
-          spacing='1'
+          spacing={1}
         >
           <Grid item>
             <Typography variant='h2'>
@@ -136,7 +136,7 @@ function Edit() {
           container
           direction='column'
           style={ { marginTop: '1rem', marginBottom: '1rem' } }
-          spacing='1'
+          spacing={1}
         >
           <Grid item>
             <Typography variant='h2'>
