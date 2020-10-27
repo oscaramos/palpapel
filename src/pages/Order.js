@@ -1,39 +1,23 @@
 import React from 'react'
-import styled from 'styled-components'
 import { TemplateHandler } from 'easy-template-x'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeft, faPrint } from '@fortawesome/free-solid-svg-icons'
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 20em;
-  margin: 0 auto;
-`
+import {
+  Grid,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Button,
+} from '@material-ui/core'
 
-const Header = styled.div`
-  position: fixed;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 20em;
-`
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import PrintIcon from '@material-ui/icons/Print'
+import ShareIcon from '@material-ui/icons/Share'
 
-const IconButton = styled.div`
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 50%;
-  
-  :hover {
-    opacity: 0.5;
-  }
-`
+import makeStyles from '@material-ui/core/styles/makeStyles'
 
-const Label = styled.div`
-  opacity: 0.4;
-`
-
-function saveFile(filename, blob) {
+const saveFile = (filename, blob) => {
   // see: https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
 
   // get downloadable url from the blob
@@ -68,7 +52,6 @@ const downloadFile = async data => {
   // Save output
   saveFile('output.docx', doc)
 }
-
 
 const toDocumentData = data => {
   if (data.schoolTelephone.length > 9
@@ -125,7 +108,15 @@ const toDocumentData = data => {
   }
 }
 
+const useStyles = makeStyles(() => ({
+  label: {
+    opacity: '0.4',
+  },
+}))
+
+
 function Order() {
+  const classes = useStyles()
   const data = {
     orderNumber: '000104',
     orderDate: new Date(),
@@ -144,38 +135,85 @@ function Order() {
   }
 
   return (
-    <Container>
-      <Header>
-        <IconButton>
-          <FontAwesomeIcon icon={ faArrowLeft } />
-        </IconButton>
-        <div>
-          <div>Nº {data.orderNumber}</div>
-          <div>{data.orderDate.getDay()}/{data.orderDate.getMonth()}/{data.orderDate.getFullYear()}</div>
+    <Container maxWidth='xs'>
+      <AppBar position='sticky' color='transparent' variant='outlined' style={{ borderBottom: '2px solid rgba(0, 0, 0, 0.12)', borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
+        <Toolbar style={ { color: 'black' } }>
+          <Grid container direction='row' justify='space-between' alignItems='center'>
+            <Grid item>
+              <IconButton>
+                <ArrowBackIcon />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Typography variant='h5' align='center'>
+                Nº { data.orderNumber }
+              </Typography>
+              <Typography variant='h6' align='center'>
+                { data.orderDate.getDay() }/{ data.orderDate.getMonth() }/{ data.orderDate.getFullYear() }
+              </Typography>
+            </Grid>
+            <Grid item>
+              <IconButton style={ { position: 'absolute', marginLeft: '-2.5rem' } }>
+                <ShareIcon />
+              </IconButton>
+              <IconButton>
+                <PrintIcon onClick={ handleClickDownload } />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar>
+
+      <Grid container direction='column' style={ { marginTop: '1rem', marginBottom: '1rem' } }>
+        <Typography variant='h2'>
+          School
+        </Typography>
+        <div className={ classes.label }>
+          Name
         </div>
-        <IconButton onClick={handleClickDownload}>
-          <FontAwesomeIcon icon={ faPrint } />
-        </IconButton>
-      </Header>
+        <Typography variant='body1'>{ data.schoolName }</Typography>
+        <div className={ classes.label }>
+          Address
+        </div>
+        <Typography variant='body1'>{ data.schoolAddress }</Typography>
+        <div className={ classes.label }>
+          RUC
+        </div>
+        <Typography variant='body1'>{ data.schoolRUC }</Typography>
+        <div className={ classes.label }>
+          Telephone Number
+        </div>
+        <Typography variant='body1'>{ data.schoolTelephone }</Typography>
 
-      <div style={ { marginTop: '3rem' } } />
-      <h2>School</h2>
-      <Label>Name</Label>
-      <div>{ data.schoolName }</div>
-      <Label>Address</Label>
-      <div>{ data.schoolAddress }</div>
-      <Label>RUC</Label>
-      <div>{ data.schoolRUC }</div>
-      <Label>Telephone Number</Label>
-      <div>{ data.schoolTelephone }</div>
+        <Typography variant='h2'>
+          Responsable
+        </Typography>
+        <div className={ classes.label }>
+          Name
+        </div>
+        <Typography variant='body1'>{ data.responsableName }</Typography>
+        <div className={ classes.label }>
+          Position
+        </div>
+        <Typography variant='body1'>{ data.responsablePosition }</Typography>
+        <div className={ classes.label }>
+          Email
+        </div>
+        <Typography variant='body1'>{ data.responsableEmail }</Typography>
+      </Grid>
 
-      <h2>Responsable</h2>
-      <Label>Name</Label>
-      <div>{ data.responsableName }</div>
-      <Label>Position</Label>
-      <div>{ data.responsablePosition }</div>
-      <Label>Email</Label>
-      <div>{ data.responsableEmail }</div>
+      <Grid container direction='column'>
+        <Grid item>
+          <Button variant='contained' color='primary' fullWidth>
+            Modify
+          </Button>
+        </Grid>
+        <Grid item style={ { marginTop: '0.5rem' } }>
+          <Button variant='contained' color='secondary' fullWidth>
+            Delete
+          </Button>
+        </Grid>
+      </Grid>
     </Container>
   )
 }
