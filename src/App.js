@@ -4,6 +4,7 @@ import { Route, Switch } from 'wouter'
 import Home from './pages/Home'
 import Order from './pages/Order'
 import Edit from './pages/Edit'
+import Search from './pages/Search'
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Route path='/' component={ Home } />
       <Route path='/order' component={ Order } />
       <Route path='/edit' component={ Edit } />
+      <Route path='/search' component={ Search } />
     </Switch>
   )
 }
