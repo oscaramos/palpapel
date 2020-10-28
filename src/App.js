@@ -16,11 +16,11 @@ function App() {
     <OrdersProvider>
       <Switch>
         <Route path='/' component={ Home } />
-        <Route path='/order/:id' component={ Order } />
-        <Route path='/edit/:id' component={ Edit } />
-        <Route path='/search' component={ Search } />
         <Route path='/login' component={ Login } />
         <Route path='/register' component={ Register } />
+        <Route path='/search' component={ Search } />
+        <Route path='/order/:id' component={ Order } />
+        <Route path='/edit/:id' component={ Edit } />
       </Switch>
     </OrdersProvider>
   )
