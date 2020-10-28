@@ -1,6 +1,6 @@
 import React from 'react'
 import { TemplateHandler } from 'easy-template-x'
-import { Link } from 'wouter'
+import { Link, useLocation } from 'wouter'
 
 import {
   Grid,
@@ -119,17 +119,30 @@ const useStyles = makeStyles(() => ({
 
 function Order({ params }) {
   const { id } = params
-  const [orders] = useOrders()
+  const [, setLocation] = useLocation()
+
+  const { getOrder, removeOrder } = useOrders()
   const classes = useStyles()
-  const data = orders[id]
+  const data = getOrder(id)
 
   const handleClickDownload = () => {
     downloadFile(toDocumentData(data))
   }
 
+  const handleDelete = () => {
+    removeOrder(id)
+    setLocation('/')
+  }
+
   return (
     <Container maxWidth='xs'>
-      <AppBar position='sticky' variant='outlined' style={{ backgroundColor: 'white', borderBottom: '2px solid rgba(0, 0, 0, 0.12)', borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
+      <AppBar position='sticky' variant='outlined' style={ {
+        backgroundColor: 'white',
+        borderBottom: '2px solid rgba(0, 0, 0, 0.12)',
+        borderLeft: 'none',
+        borderRight: 'none',
+        borderTop: 'none',
+      } }>
         <Toolbar style={ { color: 'black' } } disableGutters>
           <Grid container direction='row' justify='space-between' alignItems='center'>
             <Grid item>
@@ -199,12 +212,14 @@ function Order({ params }) {
 
       <Grid container direction='column'>
         <Grid item>
-          <Button variant='contained' color='primary' fullWidth>
-            Modify
-          </Button>
+          <Link href={ `/edit/${ id }` }>
+            <Button variant='contained' color='primary' fullWidth>
+              Modify
+            </Button>
+          </Link>
         </Grid>
         <Grid item style={ { marginTop: '0.5rem' } }>
-          <Button variant='contained' color='secondary' fullWidth>
+          <Button variant='contained' color='secondary' fullWidth onClick={ handleDelete }>
             Delete
           </Button>
         </Grid>

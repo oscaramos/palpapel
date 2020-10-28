@@ -19,7 +19,8 @@ import { toDDMMYYYY } from '../utils'
 
 
 function Home() {
-  const [orders] = useOrders()
+  const { getAllOrders } = useOrders()
+  const orders = getAllOrders()
 
   return (
     <Container maxWidth='xs'>

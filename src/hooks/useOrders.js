@@ -4,7 +4,7 @@ import { useState, createContext, useContext } from 'react'
 const OrdersContext = createContext(undefined)
 
 export function OrdersProvider({ children }) {
-  const value = useState([
+  const [orders, setOrders] = useState([
     {
       id: 0,
       orderNumber: '000104',
@@ -43,11 +43,32 @@ export function OrdersProvider({ children }) {
       responsableName: 'Bessie Cooper',
       responsablePosition: 'Teacher',
       responsableEmail: 'tim.jennings@example.com',
-    }
+    },
   ])
 
+  const getOrder = id => {
+    id = Number(id)
+    return orders.find(order => order.id === id)
+  }
+
+  const getAllOrders = () => {
+    return orders
+  }
+
+  const editOrder = (id, newOrder) => {
+    const ordersCopy = [...orders]
+    ordersCopy[id] = { ...ordersCopy[id], ...newOrder }
+    setOrders(ordersCopy)
+  }
+
+  const removeOrder = id => {
+    const ordersCopy = [...orders]
+    ordersCopy.splice(id, 1)
+    setOrders(ordersCopy)
+  }
+
   return (
-    <OrdersContext.Provider value={ value }>
+    <OrdersContext.Provider value={ { getOrder, getAllOrders, editOrder, removeOrder } }>
       { children }
     </OrdersContext.Provider>
   )

@@ -1,5 +1,5 @@
-import React from 'react'
-import { Link } from 'wouter'
+import React, { useState } from 'react'
+import { Link, useLocation } from 'wouter'
 
 import {
   Grid,
@@ -13,9 +13,47 @@ import {
 } from '@material-ui/core'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import { useOrders } from '../hooks/useOrders'
+import { toDDMMYYYY } from '../utils'
 
 
-function Edit() {
+function Edit({ params }) {
+  const { id } = params
+
+  const [, setLocation] = useLocation()
+  const { getOrder, editOrder } = useOrders()
+
+  const [orderNumber, setOrderNumber] = useState(() => getOrder(id).orderNumber)
+  const [orderDate, setOrderDate] = useState(() => toDDMMYYYY(getOrder(id).orderDate))
+
+  const [schoolName, setSchoolName] = useState(() => getOrder(id).schoolName)
+  const [schoolAddress, setSchoolAddress] = useState(() => getOrder(id).schoolAddress)
+  const [schoolRUC, setSchoolRUC] = useState(() => getOrder(id).schoolRUC)
+  const [schoolTelephone, setSchoolTelephone] = useState(() => getOrder(id).schoolTelephone)
+  const [schoolCellphone, setSchoolCellphone] = useState(() => getOrder(id).schoolCellphone)
+
+  const [responsableName, setResponsableName] = useState(() => getOrder(id).responsableName)
+  const [responsablePosition, setResponsablePosition] = useState(() => getOrder(id).responsablePosition)
+  const [responsableEmail, setResponsableEmail] = useState(() => getOrder(id).responsableEmail)
+
+  const handleSave = () => {
+    editOrder(id, {
+      orderNumber,
+      orderDate: new Date(orderDate),
+
+      schoolName,
+      schoolAddress,
+      schoolRUC,
+      schoolTelephone,
+      schoolCellphone,
+
+      responsableName,
+      responsablePosition,
+      responsableEmail,
+    })
+    setLocation(`/order/${ id }`)
+  }
+
   return (
     <Container maxWidth='xs'>
       <AppBar position='sticky' variant='outlined' style={ {
@@ -65,6 +103,8 @@ function Edit() {
               label='Order Number'
               placeholder='000104'
               fullWidth
+              value={orderNumber}
+              onChange={e => setOrderNumber(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -73,6 +113,8 @@ function Edit() {
               label='Date'
               placeholder='01/01/2020'
               fullWidth
+              value={orderDate}
+              onChange={e => setOrderDate(e.target.value)}
             />
           </Grid>
         </Grid>
@@ -95,6 +137,8 @@ function Edit() {
               label='Name'
               placeholder='Colegio de las rosas'
               fullWidth
+              value={schoolName}
+              onChange={e => setSchoolName(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -103,6 +147,8 @@ function Edit() {
               label='Address'
               placeholder='2972 Westheimer Rd. Santa Ana, Illinois 85486'
               fullWidth
+              value={schoolAddress}
+              onChange={e => setSchoolAddress(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -111,6 +157,8 @@ function Edit() {
               label='RUC'
               placeholder='20601888221'
               fullWidth
+              value={schoolRUC}
+              onChange={e => setSchoolRUC(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -119,6 +167,8 @@ function Edit() {
               label='Telephone Number'
               placeholder='(704) 555-0127'
               fullWidth
+              value={schoolTelephone}
+              onChange={e => setSchoolTelephone(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -127,6 +177,8 @@ function Edit() {
               label='Cellphone Number'
               placeholder='(704) 555-0120'
               fullWidth
+              value={schoolCellphone}
+              onChange={e => setSchoolCellphone(e.target.value)}
             />
           </Grid>
         </Grid>
@@ -149,6 +201,8 @@ function Edit() {
               label='Name'
               placeholder='Bessie Cooper'
               fullWidth
+              value={responsableName}
+              onChange={e => setResponsableName(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -157,6 +211,8 @@ function Edit() {
               label='Position'
               placeholder='Teacher'
               fullWidth
+              value={responsablePosition}
+              onChange={e => setResponsablePosition(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -165,6 +221,8 @@ function Edit() {
               label='Email'
               placeholder='betsie@example.com'
               fullWidth
+              value={responsableEmail}
+              onChange={e => setResponsableEmail(e.target.value)}
             />
           </Grid>
         </Grid>
@@ -172,11 +230,9 @@ function Edit() {
 
       <Grid container direction='column'>
         <Grid item>
-          <Link href="/order">
-            <Button variant='contained' color='primary' fullWidth>
-              Save
-            </Button>
-          </Link>
+          <Button variant='contained' color='primary' fullWidth onClick={handleSave}>
+            Save
+          </Button>
         </Grid>
       </Grid>
     </Container>
