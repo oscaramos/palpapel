@@ -1,6 +1,7 @@
-import React from 'react'
-import { Link } from 'wouter'
+import React, { useEffect } from 'react'
+import { Link, useLocation } from 'wouter'
 import { useForm } from 'react-hook-form'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
 import {
   Container,
@@ -11,13 +12,33 @@ import {
   Typography
 } from '@material-ui/core'
 
+import { auth } from '../firebase.utils'
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().required().min(8, 'password should be at least 8 characters'),
+  confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords does not match').required(),
+});
+
 
 function Register() {
-  const { register, handleSubmit } = useForm()
+  const [, setLocation] = useLocation()
+  const { register, errors, handleSubmit } = useForm({
+    resolver: yupResolver(schema)
+  })
+  const [user] = useAuthState(auth)
 
   const registerUser = data => {
-    console.log(data)
+    auth.createUserWithEmailAndPassword(data.email, data.password)
   }
+
+  useEffect(() => {
+    if (user) {
+      setLocation('/')
+    }
+  }, [user])
 
   return (
     <Container maxWidth='xs'>
@@ -25,17 +46,6 @@ function Register() {
         Register
       </Typography>
       <form onSubmit={handleSubmit(registerUser)}>
-
-        <TextField
-          variant="outlined"
-          margin="normal"
-          label="Name"
-          autoComplete="name"
-          name='name'
-          inputRef={register}
-          fullWidth
-          autoFocus
-        />
         <TextField
           variant="outlined"
           margin="normal"
@@ -43,6 +53,8 @@ function Register() {
           name='email'
           inputRef={register}
           autoComplete="email"
+          error={Boolean(errors.email)}
+          helperText={errors?.email?.message}
           fullWidth
         />
         <TextField
@@ -53,6 +65,8 @@ function Register() {
           name='password'
           inputRef={register}
           autoComplete="current-password"
+          error={Boolean(errors.password)}
+          helperText={errors?.password?.message}
           fullWidth
         />
         <TextField
@@ -62,6 +76,8 @@ function Register() {
           name='confirmPassword'
           inputRef={register}
           type="password"
+          error={Boolean(errors.confirmPassword)}
+          helperText={errors?.confirmPassword?.message}
           fullWidth
         />
         <Button
