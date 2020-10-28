@@ -16,6 +16,7 @@ import {
 import { auth } from '../firebase.utils'
 import Snackbar from '@material-ui/core/Snackbar'
 import Alert from '@material-ui/lab/Alert'
+import { useError } from '../hooks/useError'
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -28,38 +29,17 @@ function Login() {
   const { register, errors, handleSubmit } = useForm({
     resolver: yupResolver(schema)
   })
-
-  const [errorSnack, setErrorSnack] = useState({
-    open: false,
-    message: ''
-  })
-
-  const handleCloseSnack = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setErrorSnack({ open: false, message: '' });
-  };
+  const { throwError } = useError();
 
   const loginUser = data => {
     auth.signInWithEmailAndPassword(data.email, data.password)
       .catch(error => {
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-          setErrorSnack({
-            open: true,
-            message: 'The email address or password are wrong'
-          })
+          throwError('The email address or password are wrong')
         } else if (error.code === 'auth/too-many-requests') {
-          setErrorSnack({
-            open: true,
-            message: 'Too many attempts',
-          })
+          throwError('Too many attempts')
         } else {
-          setErrorSnack({
-            open: true,
-            message: 'Unknown error',
-          })
+          throwError('Unknown error')
         }
       })
   }
@@ -68,7 +48,7 @@ function Login() {
     if (user && !loading) {
       setLocation('/')
     }
-  }, [user])
+  }, [user, loading, setLocation])
 
   return (
     <Container maxWidth='xs'>
@@ -118,11 +98,6 @@ function Login() {
           </Link>
         </Grid>
       </Grid>
-      <Snackbar open={errorSnack.open} autoHideDuration={6000} onClose={handleCloseSnack}>
-        <Alert elevation={6} variant="filled" severity="error">
-          { errorSnack.message }
-        </Alert>
-      </Snackbar>
     </Container>
   )
 }

@@ -1,74 +1,29 @@
-import React from 'react'
-import { useState, createContext, useContext } from 'react'
+import React, { createContext, useContext } from 'react'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { firestore } from '../firebase.utils'
 
 const OrdersContext = createContext(undefined)
 
 export function OrdersProvider({ children }) {
-  const [orders, setOrders] = useState([
-    {
-      id: 0,
-      orderNumber: '000104',
-      orderDate: new Date(),
-      schoolName: 'Colegio de las rosas',
-      schoolAddress: '2972 Westheimer Rd. Santa Ana, Illinois 85486 ',
-      schoolRUC: '20601888221',
-      schoolTelephone: '211425',
-      schoolCellphone: '921492405',
-      responsableName: 'Bessie Cooper',
-      responsablePosition: 'Teacher',
-      responsableEmail: 'tim.jennings@example.com',
-    },
-    {
-      id: 1,
-      orderNumber: '000105',
-      orderDate: new Date(),
-      schoolName: 'Colegio de las rosas',
-      schoolAddress: '2972 Westheimer Rd. Santa Ana, Illinois 85486 ',
-      schoolRUC: '20601888221',
-      schoolTelephone: '211425',
-      schoolCellphone: '921492405',
-      responsableName: 'Bessie Cooper',
-      responsablePosition: 'Teacher',
-      responsableEmail: 'tim.jennings@example.com',
-    },
-    {
-      id: 2,
-      orderNumber: '000106',
-      orderDate: new Date(),
-      schoolName: 'Colegio de las rosas',
-      schoolAddress: '2972 Westheimer Rd. Santa Ana, Illinois 85486 ',
-      schoolRUC: '20601888221',
-      schoolTelephone: '211425',
-      schoolCellphone: '921492405',
-      responsableName: 'Bessie Cooper',
-      responsablePosition: 'Teacher',
-      responsableEmail: 'tim.jennings@example.com',
-    },
-  ])
-
   const getOrder = id => {
-    id = Number(id)
-    return orders.find(order => order.id === id)
-  }
-
-  const getAllOrders = () => {
-    return orders
+    // id = Number(id)
+    // return orders.find(order => order.id === id)
   }
 
   const editOrder = (id, newOrder) => {
-    const ordersCopy = [...orders]
-    ordersCopy[id] = { ...ordersCopy[id], ...newOrder }
-    setOrders(ordersCopy)
+    // const ordersCopy = [...orders]
+    // ordersCopy[id] = { ...ordersCopy[id], ...newOrder }
+    // setOrders(ordersCopy)
   }
 
   const removeOrder = id => {
-    const ordersCopy = [...orders]
-    ordersCopy.splice(id, 1)
-    setOrders(ordersCopy)
+    // const ordersCopy = [...orders]
+    // ordersCopy.splice(id, 1)
+    // setOrders(ordersCopy)
   }
 
   return (
-    <OrdersContext.Provider value={ { getOrder, getAllOrders, editOrder, removeOrder } }>
+    <OrdersContext.Provider value={ { getOrder, editOrder, removeOrder } }>
       { children }
     </OrdersContext.Provider>
   )
@@ -78,6 +33,38 @@ export function useOrders() {
   const context = useContext(OrdersContext)
   if (context === undefined) {
     throw new Error('OrdersContext must be within a OrdersProvider')
+  }
+  return context
+}
+
+const GetAllOrdersContext = createContext(undefined)
+
+export function GetAllOrdersProvider({ children }) {
+  const [rawOrders, loading, error] = useCollectionData(
+    firestore.collection('orders'),
+    {
+      snapshotListenOptions: { includeMetadataChanges: true },
+    },
+  )
+
+  // Transform the order format in firebase to app format
+  const orders = rawOrders?.map((order, index) => ({
+    ...order,
+    id: index,
+    orderDate: order.orderDate.toDate(),
+  }))
+
+  return (
+    <GetAllOrdersContext.Provider value={ [orders, loading, error] }>
+      { children }
+    </GetAllOrdersContext.Provider>
+  )
+}
+
+export function useGetAllOrders() {
+  const context = useContext(GetAllOrdersContext)
+  if (context === undefined) {
+    throw new Error('GetAllOrdersContext must be within a GetAllOrdersProvider')
   }
   return context
 }
