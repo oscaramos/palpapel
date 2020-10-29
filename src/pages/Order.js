@@ -10,15 +10,121 @@ import {
   Typography,
   Container,
   Button,
+  CircularProgress
 } from '@material-ui/core'
+import Skeleton from '@material-ui/lab/Skeleton'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 import PrintIcon from '@material-ui/icons/Print'
 import ShareIcon from '@material-ui/icons/Share'
 
-import makeStyles from '@material-ui/core/styles/makeStyles'
 import { useOrders } from '../hooks/useOrders'
 import { toDDMMYYYY } from '../utils'
+
+function OrderToolBar({ data, loading, onClickDownload }) {
+  return (
+    <AppBar position='sticky' variant='outlined' style={ {
+      backgroundColor: 'white',
+      borderBottom: '2px solid rgba(0, 0, 0, 0.12)',
+      borderLeft: 'none',
+      borderRight: 'none',
+      borderTop: 'none',
+    } }>
+      <Toolbar style={ { color: 'black' } } disableGutters>
+        <Grid container direction='row' justify='space-between' alignItems='center'>
+          <Grid item>
+            <Link href='/'>
+              <IconButton>
+                <ArrowBackIcon />
+              </IconButton>
+            </Link>
+          </Grid>
+          {
+            loading ?
+              <Grid item>
+                <Grid container direction='column' justify='center' alignItems='center'>
+                  <Skeleton variant='rect' width={120} height={20}
+                   style={{ marginBottom: '1rem'}} />
+                  <Skeleton variant='rect' width={100} height={15} />
+                </Grid>
+              </Grid>
+              :
+              <Grid item>
+                <Typography variant='h5' align='center'>
+                  Nº { data.orderNumber }
+                </Typography>
+                <Typography variant='h6' align='center'>
+                  { toDDMMYYYY(data.orderDate) }
+                </Typography>
+              </Grid>
+          }
+          <Grid item>
+            <IconButton style={ { position: 'absolute', marginLeft: '-2.5rem' } }>
+              <ShareIcon />
+            </IconButton>
+            <IconButton onClick={ onClickDownload }>
+              <PrintIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Toolbar>
+    </AppBar>
+  )
+}
+
+function OrderDetails({ data, loading }) {
+  const label = {
+    opacity: '0.4',
+  }
+
+  if (loading) {
+    return (
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress style={{ alignText: 'center'}} />
+      </div>
+    )
+  }
+
+  return (
+    <Grid container direction='column' style={ { marginTop: '1rem', marginBottom: '1rem' } }>
+      <Typography variant='h2'>
+        School
+      </Typography>
+      <div style={ label }>
+        Name
+      </div>
+      <Typography variant='body1'>{ data.schoolName }</Typography>
+      <div style={ label }>
+        Address
+      </div>
+      <Typography variant='body1'>{ data.schoolAddress }</Typography>
+      <div style={ label }>
+        RUC
+      </div>
+      <Typography variant='body1'>{ data.schoolRUC }</Typography>
+      <div style={ label }>
+        Telephone Number
+      </div>
+      <Typography variant='body1'>{ data.schoolTelephone }</Typography>
+
+      <Typography variant='h2'>
+        Responsable
+      </Typography>
+      <div style={ label }>
+        Name
+      </div>
+      <Typography variant='body1'>{ data.responsableName }</Typography>
+      <div style={ label }>
+        Position
+      </div>
+      <Typography variant='body1'>{ data.responsablePosition }</Typography>
+      <div style={ label }>
+        Email
+      </div>
+      <Typography variant='body1'>{ data.responsableEmail }</Typography>
+    </Grid>
+  )
+}
 
 const saveFile = (filename, blob) => {
   // see: https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
@@ -111,18 +217,11 @@ const toDocumentData = data => {
   }
 }
 
-const useStyles = makeStyles(() => ({
-  label: {
-    opacity: '0.4',
-  },
-}))
-
 function Order({ params }) {
   const { id } = params
   const [, setLocation] = useLocation()
 
-  const { getOrder, removeOrder } = useOrders()
-  const classes = useStyles()
+  const { getOrder: [getOrder, loading, error], deleteOrder } = useOrders()
   const data = getOrder(id)
 
   const handleClickDownload = () => {
@@ -130,85 +229,22 @@ function Order({ params }) {
   }
 
   const handleDelete = () => {
-    removeOrder(id)
+    deleteOrder(id)
     setLocation('/')
   }
 
   return (
     <Container maxWidth='xs'>
-      <AppBar position='sticky' variant='outlined' style={ {
-        backgroundColor: 'white',
-        borderBottom: '2px solid rgba(0, 0, 0, 0.12)',
-        borderLeft: 'none',
-        borderRight: 'none',
-        borderTop: 'none',
-      } }>
-        <Toolbar style={ { color: 'black' } } disableGutters>
-          <Grid container direction='row' justify='space-between' alignItems='center'>
-            <Grid item>
-              <Link href='/'>
-                <IconButton>
-                  <ArrowBackIcon />
-                </IconButton>
-              </Link>
-            </Grid>
-            <Grid item>
-              <Typography variant='h5' align='center'>
-                Nº { data.orderNumber }
-              </Typography>
-              <Typography variant='h6' align='center'>
-                { toDDMMYYYY(data.orderDate) }
-              </Typography>
-            </Grid>
-            <Grid item>
-              <IconButton style={ { position: 'absolute', marginLeft: '-2.5rem' } }>
-                <ShareIcon />
-              </IconButton>
-              <IconButton onClick={ handleClickDownload }>
-                <PrintIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
+      <OrderToolBar
+        data={ data }
+        loading={ loading }
+        onClickDownload={ handleClickDownload }
+      />
 
-      <Grid container direction='column' style={ { marginTop: '1rem', marginBottom: '1rem' } }>
-        <Typography variant='h2'>
-          School
-        </Typography>
-        <div className={ classes.label }>
-          Name
-        </div>
-        <Typography variant='body1'>{ data.schoolName }</Typography>
-        <div className={ classes.label }>
-          Address
-        </div>
-        <Typography variant='body1'>{ data.schoolAddress }</Typography>
-        <div className={ classes.label }>
-          RUC
-        </div>
-        <Typography variant='body1'>{ data.schoolRUC }</Typography>
-        <div className={ classes.label }>
-          Telephone Number
-        </div>
-        <Typography variant='body1'>{ data.schoolTelephone }</Typography>
-
-        <Typography variant='h2'>
-          Responsable
-        </Typography>
-        <div className={ classes.label }>
-          Name
-        </div>
-        <Typography variant='body1'>{ data.responsableName }</Typography>
-        <div className={ classes.label }>
-          Position
-        </div>
-        <Typography variant='body1'>{ data.responsablePosition }</Typography>
-        <div className={ classes.label }>
-          Email
-        </div>
-        <Typography variant='body1'>{ data.responsableEmail }</Typography>
-      </Grid>
+      <OrderDetails
+        data={ data }
+        loading={ loading }
+      />
 
       <Grid container direction='column'>
         <Grid item>

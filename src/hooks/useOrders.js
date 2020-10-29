@@ -5,45 +5,10 @@ import { firestore } from '../firebase.utils'
 const OrdersContext = createContext(undefined)
 
 export function OrdersProvider({ children }) {
-  const getOrder = id => {
-    // id = Number(id)
-    // return orders.find(order => order.id === id)
-  }
-
-  const editOrder = (id, newOrder) => {
-    // const ordersCopy = [...orders]
-    // ordersCopy[id] = { ...ordersCopy[id], ...newOrder }
-    // setOrders(ordersCopy)
-  }
-
-  const removeOrder = id => {
-    // const ordersCopy = [...orders]
-    // ordersCopy.splice(id, 1)
-    // setOrders(ordersCopy)
-  }
-
-  return (
-    <OrdersContext.Provider value={ { getOrder, editOrder, removeOrder } }>
-      { children }
-    </OrdersContext.Provider>
-  )
-}
-
-export function useOrders() {
-  const context = useContext(OrdersContext)
-  if (context === undefined) {
-    throw new Error('OrdersContext must be within a OrdersProvider')
-  }
-  return context
-}
-
-const GetAllOrdersContext = createContext(undefined)
-
-export function GetAllOrdersProvider({ children }) {
   const [rawOrders, loading, error] = useCollectionData(
     firestore.collection('orders'),
     {
-      snapshotListenOptions: { includeMetadataChanges: true },
+      idField: true,
     },
   )
 
@@ -52,19 +17,42 @@ export function GetAllOrdersProvider({ children }) {
     ...order,
     id: index,
     orderDate: order.orderDate.toDate(),
+    firebaseId: order['true'] // ??
+    // todo: displayDate
   }))
 
+  const getOrder = id => orders?.find(order => String(order.id) === String(id))
+
+  const editOrder = async (id, data) => {
+    const firebaseData = getOrder(id)
+    const docRef = firestore.collection('orders').doc(firebaseData.firebaseId)
+    await docRef.update(data)
+  }
+
+  const deleteOrder = async (id) => {
+    const firebaseData = getOrder(id)
+    const docRef = firestore.collection('orders').doc(firebaseData.firebaseId)
+    await docRef.delete()
+  }
+
   return (
-    <GetAllOrdersContext.Provider value={ [orders, loading, error] }>
+    <OrdersContext.Provider value={
+      {
+        getAllOrders: [orders, loading, error],
+        getOrder: [getOrder, loading, error],
+        editOrder,
+        deleteOrder
+      }
+    }>
       { children }
-    </GetAllOrdersContext.Provider>
+    </OrdersContext.Provider>
   )
 }
 
-export function useGetAllOrders() {
-  const context = useContext(GetAllOrdersContext)
+export function useOrders() {
+  const context = useContext(OrdersContext)
   if (context === undefined) {
-    throw new Error('GetAllOrdersContext must be within a GetAllOrdersProvider')
+    throw new Error('useOrders must be within a OrdersProvider')
   }
   return context
 }

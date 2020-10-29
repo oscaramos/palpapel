@@ -21,16 +21,15 @@ import SearchIcon from '@material-ui/icons/Search'
 import MenuIcon from '@material-ui/icons/Menu'
 
 import OrderCard from '../components/OrderCard'
-import { useGetAllOrders } from '../hooks/useOrders'
+import { useOrders } from '../hooks/useOrders'
 import { useError } from '../hooks/useError'
 
-import { auth } from '../firebase.utils'
+import { auth, firestore } from '../firebase.utils'
 import { toDDMMYYYY } from '../utils'
 
-function MyOrders() {
-  const [orders, loading, error] = useGetAllOrders()
-
+function MyOrders({ orders, loading, error }) {
   const { throwError } = useError()
+
   useEffect(() => {
     if (error) {
       throwError('Error loading my orders')
@@ -107,6 +106,52 @@ function SharedWithMe() {
   )
 }
 
+function Operations() {
+  const [, setLocation] = useLocation()
+  const { getAllOrders: [orders, loading, error] } = useOrders()
+  const [createdOrderId, setCreatedOrderId] = useState(null)
+
+  const handleCreateOrder = async () => {
+    const res = await firestore.collection('orders').add({
+      orderDate: new Date(),
+      orderNumber: "",
+      schoolName: "",
+      schoolAddress: "",
+      schoolRUC: "",
+      schoolTelephone: "",
+      schoolCellphone: "",
+      responsableName: "",
+      responsablePosition: "",
+      responsableEmail: "",
+    })
+    setCreatedOrderId(res.id)
+  }
+
+  useEffect(() => {
+    if (!loading && !error && createdOrderId) {
+      const order = orders.find(order => order.firebaseId === createdOrderId)
+      setLocation(`/edit/${order.id}`);
+    }
+  }, [loading, error, createdOrderId])
+
+  return (
+    <Grid container direction='column' style={ { marginTop: '1rem' } }>
+      <MyOrders
+        orders={orders}
+        loading={loading}
+        error={error}
+      />
+      <SharedWithMe />
+
+      <Grid item>
+        <Button variant='contained' color='primary' fullWidth onClick={handleCreateOrder}>
+          Create New Order
+        </Button>
+      </Grid>
+    </Grid>
+  )
+}
+
 
 function Home() {
   const [, setLocation] = useLocation()
@@ -168,18 +213,7 @@ function Home() {
         <MenuItem onClick={ () => {logoutUser(); handleCloseMenu()} }>Logout</MenuItem>
       </Menu>
 
-      <Grid container direction='column' style={ { marginTop: '1rem' } }>
-        <MyOrders />
-        <SharedWithMe />
-
-        <Grid item>
-          <Link href='/edit'>
-            <Button variant='contained' color='primary' fullWidth>
-              Create New Order
-            </Button>
-          </Link>
-        </Grid>
-      </Grid>
+      <Operations />
     </Container>
   )
 }

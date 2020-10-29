@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Route, Switch } from 'wouter'
-import { GetAllOrdersProvider, OrdersProvider } from './hooks/useOrders'
+import { OrdersProvider } from './hooks/useOrders'
 
 import Home from './pages/Home'
 import Order from './pages/Order'
@@ -47,21 +47,19 @@ function ErrorPopup() {
 
 function App() {
   return (
-    <GetAllOrdersProvider>
-      <ErrorProvider>
-        <OrdersProvider>
-          <Switch>
-            <Route path='/' component={ Home } />
-            <Route path='/login' component={ Login } />
-            <Route path='/register' component={ Register } />
-            <Route path='/search' component={ Search } />
-            <Route path='/order/:id' component={ Order } />
-            <Route path='/edit/:id' component={ Edit } />
-          </Switch>
-        </OrdersProvider>
-        <ErrorPopup />
-      </ErrorProvider>
-    </GetAllOrdersProvider>
+    <ErrorProvider>
+      <OrdersProvider>
+        <Switch>
+          <Route path='/' component={ Home } />
+          <Route path='/login' component={ Login } />
+          <Route path='/register' component={ Register } />
+          <Route path='/search' component={ Search } />
+          <Route path='/order/:id' component={ Order } />
+          <Route path='/edit/:id' component={ Edit } />
+        </Switch>
+      </OrdersProvider>
+      <ErrorPopup />
+    </ErrorProvider>
   )
 }
 
