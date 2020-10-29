@@ -25,7 +25,6 @@ import { useOrders } from '../hooks/useOrders'
 import { useError } from '../hooks/useError'
 
 import { auth, firestore } from '../firebase.utils'
-import { toDDMMYYYY } from '../utils'
 
 function MyOrders({ orders, loading, error }) {
   const { throwError } = useError()
@@ -50,7 +49,7 @@ function MyOrders({ orders, loading, error }) {
                 id={order.id}
                 responsableName={order.responsableName}
                 orderNumber={order.orderNumber}
-                orderDate={toDDMMYYYY(order.orderDate)}
+                orderDate={order.orderDisplayDate}
               />
             </Grid>
           ))

@@ -9,17 +9,23 @@ import {
   Typography,
   Container,
   Button,
-  TextField
+  TextField,
+  CircularProgress
 } from '@material-ui/core'
 
+import {
+  MuiPickersUtilsProvider,
+  DatePicker
+} from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns'
+
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+
 import { useOrders } from '../hooks/useOrders'
-import { fromDDMMYYYY, toDDMMYYYY } from '../utils'
-import CircularProgress from '@material-ui/core/CircularProgress'
 
 function EditForm({ data, onSubmit }) {
   const [orderNumber, setOrderNumber] = useState(data.orderNumber)
-  const [orderDate, setOrderDate] = useState(toDDMMYYYY(data.orderDate))
+  const [orderDate, handleOrderDateChange] = useState(data.orderDate)
 
   const [schoolName, setSchoolName] = useState(data.schoolName)
   const [schoolAddress, setSchoolAddress] = useState(data.schoolAddress)
@@ -35,7 +41,7 @@ function EditForm({ data, onSubmit }) {
     onSubmit(
       {
         orderNumber,
-        orderDate: fromDDMMYYYY(orderDate),
+        orderDate,
         schoolName,
         schoolAddress,
         schoolRUC,
@@ -78,14 +84,15 @@ function EditForm({ data, onSubmit }) {
           />
         </Grid>
         <Grid item>
-          <TextField
-            variant='outlined'
-            label='Date'
-            placeholder='01/01/2020'
-            fullWidth
-            value={orderDate}
-            onChange={e => setOrderDate(e.target.value)}
-          />
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <DatePicker
+              label='Order Date'
+              value={orderDate}
+              onChange={handleOrderDateChange}
+              inputVariant='outlined'
+              fullWidth
+            />
+          </MuiPickersUtilsProvider>
         </Grid>
       </Grid>
 

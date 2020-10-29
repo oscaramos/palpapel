@@ -19,7 +19,6 @@ import PrintIcon from '@material-ui/icons/Print'
 import ShareIcon from '@material-ui/icons/Share'
 
 import { useOrders } from '../hooks/useOrders'
-import { toDDMMYYYY } from '../utils'
 
 function OrderToolBar({ data, loading, onClickDownload }) {
   return (
@@ -54,7 +53,7 @@ function OrderToolBar({ data, loading, onClickDownload }) {
                   Nº { data.orderNumber }
                 </Typography>
                 <Typography variant='h6' align='center'>
-                  { toDDMMYYYY(data.orderDate) }
+                  { data.orderDisplayDate }
                 </Typography>
               </Grid>
           }

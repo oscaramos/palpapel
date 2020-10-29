@@ -1,5 +1,7 @@
 import React, { createContext, useContext } from 'react'
 import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { format } from 'date-fns'
+
 import { firestore } from '../firebase.utils'
 
 const OrdersContext = createContext(undefined)
@@ -17,8 +19,8 @@ export function OrdersProvider({ children }) {
     ...order,
     id: index,
     orderDate: order.orderDate.toDate(),
-    firebaseId: order['true'] // ??
-    // todo: displayDate
+    orderDisplayDate: format(order.orderDate.toDate(), 'dd/MM/yyyy'),
+    firebaseId: order['true'],
   }))
 
   const getOrder = id => orders?.find(order => String(order.id) === String(id))
