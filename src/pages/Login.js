@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import * as yup from 'yup'
 import { Link, useLocation } from 'wouter'
 import { useForm } from 'react-hook-form'
@@ -14,8 +14,6 @@ import {
   Typography
 } from '@material-ui/core'
 import { auth } from '../firebase.utils'
-import Snackbar from '@material-ui/core/Snackbar'
-import Alert from '@material-ui/lab/Alert'
 import { useError } from '../hooks/useError'
 
 const schema = yup.object().shape({

@@ -38,7 +38,7 @@ function Register() {
     if (user) {
       setLocation('/')
     }
-  }, [user])
+  }, [user, setLocation])
 
   return (
     <Container maxWidth='xs'>
