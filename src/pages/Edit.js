@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'wouter'
 
 import {
@@ -217,10 +217,13 @@ function EditForm({ data, onSubmit }) {
 function Edit({ params }) {
   const { id } = params
 
-
   const [, setLocation] = useLocation()
-  const { getOrder: [getOrder, loading, error], editOrder } = useOrders()
-  const data = getOrder(id)
+  const { getOrder: [getOrder, order, loading, error], editOrder } = useOrders()
+  const data = order
+
+  useEffect(() => {
+    getOrder(id)
+  }, [getOrder, id])
 
   const handleSave = data => {
     editOrder(id, {
@@ -273,10 +276,13 @@ function Edit({ params }) {
             <CircularProgress style={{ alignText: 'center'}} />
           </div>
         :
-          <EditForm
-            data={data}
-            onSubmit={handleSave}
-          />
+          data?
+            <EditForm
+              data={data}
+              onSubmit={handleSave}
+            />
+          :
+            null
       }
     </Container>
   )

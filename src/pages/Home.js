@@ -83,7 +83,7 @@ function SharedWithMe() {
 
 function Operations() {
   const [, setLocation] = useLocation()
-  const { getAllOrders: [orders, loading, error, loadMore], createOrder } = useOrders()
+  const { getPaginatedOrders: [orders, loading, error, loadMore], createOrder } = useOrders()
 
   const handleCreateOrder = async () => {
     const res = await createOrder()

@@ -12,7 +12,6 @@ const useFirestoreLoadMore = queryFn => {
   useEffect(() => {
     setData([])
     setQuery(queryFn())
-    console.log('exec')
   }, [queryFn])
 
   useEffect(() => {
@@ -26,7 +25,14 @@ const useFirestoreLoadMore = queryFn => {
     setQuery(queryFn().startAfter(last))
   }, [queryFn, setQuery, last])
 
-  return [[data, loading, error], more]
+  // reset everything to the beginning
+  const again = () => {
+    setLast(null)
+    setData([])
+    setQuery(queryFn())
+  }
+
+  return [[data, loading, error], more, again]
 }
 
 export default useFirestoreLoadMore

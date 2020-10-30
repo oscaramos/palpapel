@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TemplateHandler } from 'easy-template-x'
 import { Link, useLocation } from 'wouter'
 
@@ -50,10 +50,10 @@ function OrderToolBar({ data, loading, onClickDownload }) {
               :
               <Grid item>
                 <Typography variant='h5' align='center'>
-                  Nº { data.orderNumber }
+                  Nº { data?.orderNumber }
                 </Typography>
                 <Typography variant='h6' align='center'>
-                  { data.orderDisplayDate }
+                  { data?.orderDisplayDate }
                 </Typography>
               </Grid>
           }
@@ -74,6 +74,10 @@ function OrderToolBar({ data, loading, onClickDownload }) {
 function OrderDetails({ data, loading }) {
   const label = {
     opacity: '0.4',
+  }
+
+  if (!data) {
+    return null
   }
 
   if (loading) {
@@ -220,8 +224,12 @@ function Order({ params }) {
   const { id } = params
   const [, setLocation] = useLocation()
 
-  const { getOrder: [getOrder, loading, error], deleteOrder } = useOrders()
-  const data = getOrder(id)
+  const { getOrder: [getOrder, order, loading, error], deleteOrder } = useOrders()
+  const data = order
+
+  useEffect(() => {
+    getOrder(id)
+  }, [getOrder, id])
 
   const handleClickDownload = () => {
     downloadFile(toDocumentData(data))
