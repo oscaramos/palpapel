@@ -24,7 +24,7 @@ import OrderCard from '../components/OrderCard'
 import { useOrders } from '../hooks/useOrders'
 import { useError } from '../hooks/useError'
 
-import { auth, firestore } from '../firebase.utils'
+import { auth } from '../firebase.utils'
 
 function MyOrders({ orders, loading, error }) {
   const { throwError } = useError()
@@ -33,7 +33,7 @@ function MyOrders({ orders, loading, error }) {
     if (error) {
       throwError('Error loading my orders')
     }
-  }, [error])
+  }, [error, throwError])
 
   return (
     <Grid item>
@@ -59,10 +59,6 @@ function MyOrders({ orders, loading, error }) {
             <Skeleton variant="rect" width="100%" height={118} animation="wave"/>
         }
       </Grid>
-
-      <Button variant='outlined' fullWidth>
-        See More
-      </Button>
     </Grid>
   )
 }
@@ -75,27 +71,7 @@ function SharedWithMe() {
       </Typography>
 
       <Grid container direction='column' spacing={1} style={ { marginTop: '0.5rem', marginBottom: '0.5rem' } }>
-        <Grid item>
-          <OrderCard
-            responsableName='Responsable Name'
-            orderNumber='000104'
-            orderDate='01/01/2020'
-          />
-        </Grid>
-        <Grid item>
-          <OrderCard
-            responsableName='Responsable Name'
-            orderNumber='000104'
-            orderDate='01/01/2020'
-          />
-        </Grid>
-        <Grid item>
-          <OrderCard
-            responsableName='Responsable Name'
-            orderNumber='000104'
-            orderDate='01/01/2020'
-          />
-        </Grid>
+
       </Grid>
 
       <Button variant='outlined' fullWidth>
@@ -107,31 +83,12 @@ function SharedWithMe() {
 
 function Operations() {
   const [, setLocation] = useLocation()
-  const { getAllOrders: [orders, loading, error] } = useOrders()
-  const [createdOrderId, setCreatedOrderId] = useState(null)
+  const { getAllOrders: [orders, loading, error, loadMore], createOrder } = useOrders()
 
   const handleCreateOrder = async () => {
-    const res = await firestore.collection('orders').add({
-      orderDate: new Date(),
-      orderNumber: "",
-      schoolName: "",
-      schoolAddress: "",
-      schoolRUC: "",
-      schoolTelephone: "",
-      schoolCellphone: "",
-      responsableName: "",
-      responsablePosition: "",
-      responsableEmail: "",
-    })
-    setCreatedOrderId(res.id)
+    const res = await createOrder()
+    setLocation(`/edit/${res.id}`);
   }
-
-  useEffect(() => {
-    if (!loading && !error && createdOrderId) {
-      const order = orders.find(order => order.firebaseId === createdOrderId)
-      setLocation(`/edit/${order.id}`);
-    }
-  }, [loading, error, createdOrderId])
 
   return (
     <Grid container direction='column' style={ { marginTop: '1rem' } }>
@@ -140,6 +97,10 @@ function Operations() {
         loading={loading}
         error={error}
       />
+      <Button variant='outlined' fullWidth onClick={loadMore}>
+        See More
+      </Button>
+
       <SharedWithMe />
 
       <Grid item>
