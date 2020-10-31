@@ -1,5 +1,5 @@
-import { red } from '@material-ui/core/colors'
-import { createMuiTheme } from '@material-ui/core/styles'
+import { red } from "@material-ui/core/colors"
+import { createMuiTheme } from "@material-ui/core/styles"
 
 const arcBlue = "#0B72B9"
 const arcGrey = "#868686"
@@ -9,7 +9,7 @@ const theme = createMuiTheme({
   palette: {
     common: {
       arcBlue,
-      arcGrey
+      arcGrey,
     },
     primary: {
       main: arcBlue,
@@ -18,19 +18,19 @@ const theme = createMuiTheme({
       main: red.A400,
     },
     background: {
-      default: '#fff',
+      default: "#fff",
     },
   },
   typography: {
     h1: {
-      fontSize: '2em',
-      fontWeight: 'bold',
+      fontSize: "2em",
+      fontWeight: "bold",
     },
     h2: {
-      fontSize: '1.75em',
-      fontWeight: 'bold',
-    }
-  }
+      fontSize: "1.75em",
+      fontWeight: "bold",
+    },
+  },
 })
 
 export default theme

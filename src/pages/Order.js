@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import { TemplateHandler } from 'easy-template-x'
-import { Link, useLocation } from 'wouter'
+import React, { useEffect } from "react"
+import { TemplateHandler } from "easy-template-x"
+import { Link, useLocation } from "wouter"
 
 import {
   Grid,
@@ -10,59 +10,76 @@ import {
   Typography,
   Container,
   Button,
-  CircularProgress
-} from '@material-ui/core'
-import Skeleton from '@material-ui/lab/Skeleton'
+  CircularProgress,
+} from "@material-ui/core"
+import Skeleton from "@material-ui/lab/Skeleton"
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-import PrintIcon from '@material-ui/icons/Print'
-import ShareIcon from '@material-ui/icons/Share'
+import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+import PrintIcon from "@material-ui/icons/Print"
+import ShareIcon from "@material-ui/icons/Share"
 
-import { useOrders } from '../hooks/useOrders'
-import { useError } from '../hooks/useError'
+import { useOrders } from "../hooks/useOrders"
+import { useError } from "../hooks/useError"
 
 function OrderToolBar({ data, loading, onClickDownload }) {
   return (
-    <AppBar position='sticky' variant='outlined' style={ {
-      backgroundColor: 'white',
-      borderBottom: '2px solid rgba(0, 0, 0, 0.12)',
-      borderLeft: 'none',
-      borderRight: 'none',
-      borderTop: 'none',
-    } }>
-      <Toolbar style={ { color: 'black' } } disableGutters>
-        <Grid container direction='row' justify='space-between' alignItems='center'>
+    <AppBar
+      position="sticky"
+      variant="outlined"
+      style={{
+        backgroundColor: "white",
+        borderBottom: "2px solid rgba(0, 0, 0, 0.12)",
+        borderLeft: "none",
+        borderRight: "none",
+        borderTop: "none",
+      }}
+    >
+      <Toolbar style={{ color: "black" }} disableGutters>
+        <Grid
+          container
+          direction="row"
+          justify="space-between"
+          alignItems="center"
+        >
           <Grid item>
-            <Link href='/'>
+            <Link href="/">
               <IconButton>
                 <ArrowBackIcon />
               </IconButton>
             </Link>
           </Grid>
-          {
-            loading ?
-              <Grid item>
-                <Grid container direction='column' justify='center' alignItems='center'>
-                  <Skeleton variant='rect' width={120} height={20}
-                   style={{ marginBottom: '1rem'}} />
-                  <Skeleton variant='rect' width={100} height={15} />
-                </Grid>
+          {loading ? (
+            <Grid item>
+              <Grid
+                container
+                direction="column"
+                justify="center"
+                alignItems="center"
+              >
+                <Skeleton
+                  variant="rect"
+                  width={120}
+                  height={20}
+                  style={{ marginBottom: "1rem" }}
+                />
+                <Skeleton variant="rect" width={100} height={15} />
               </Grid>
-              :
-              <Grid item>
-                <Typography variant='h5' align='center'>
-                  Nº { data?.orderNumber }
-                </Typography>
-                <Typography variant='h6' align='center'>
-                  { data?.orderDisplayDate }
-                </Typography>
-              </Grid>
-          }
+            </Grid>
+          ) : (
+            <Grid item>
+              <Typography variant="h5" align="center">
+                Nº {data?.orderNumber}
+              </Typography>
+              <Typography variant="h6" align="center">
+                {data?.orderDisplayDate}
+              </Typography>
+            </Grid>
+          )}
           <Grid item>
-            <IconButton style={ { position: 'absolute', marginLeft: '-2.5rem' } }>
+            <IconButton style={{ position: "absolute", marginLeft: "-2.5rem" }}>
               <ShareIcon />
             </IconButton>
-            <IconButton onClick={ onClickDownload }>
+            <IconButton onClick={onClickDownload}>
               <PrintIcon />
             </IconButton>
           </Grid>
@@ -74,7 +91,7 @@ function OrderToolBar({ data, loading, onClickDownload }) {
 
 function OrderDetails({ data, loading }) {
   const label = {
-    opacity: '0.4',
+    opacity: "0.4",
   }
 
   if (!data) {
@@ -83,49 +100,35 @@ function OrderDetails({ data, loading }) {
 
   if (loading) {
     return (
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress style={{ alignText: 'center'}} />
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <CircularProgress style={{ alignText: "center" }} />
       </div>
     )
   }
 
   return (
-    <Grid container direction='column' style={ { marginTop: '1rem', marginBottom: '1rem' } }>
-      <Typography variant='h2'>
-        School
-      </Typography>
-      <div style={ label }>
-        Name
-      </div>
-      <Typography variant='body1'>{ data.schoolName }</Typography>
-      <div style={ label }>
-        Address
-      </div>
-      <Typography variant='body1'>{ data.schoolAddress }</Typography>
-      <div style={ label }>
-        RUC
-      </div>
-      <Typography variant='body1'>{ data.schoolRUC }</Typography>
-      <div style={ label }>
-        Telephone Number
-      </div>
-      <Typography variant='body1'>{ data.schoolTelephone }</Typography>
+    <Grid
+      container
+      direction="column"
+      style={{ marginTop: "1rem", marginBottom: "1rem" }}
+    >
+      <Typography variant="h2">School</Typography>
+      <div style={label}>Name</div>
+      <Typography variant="body1">{data.schoolName}</Typography>
+      <div style={label}>Address</div>
+      <Typography variant="body1">{data.schoolAddress}</Typography>
+      <div style={label}>RUC</div>
+      <Typography variant="body1">{data.schoolRUC}</Typography>
+      <div style={label}>Telephone Number</div>
+      <Typography variant="body1">{data.schoolTelephone}</Typography>
 
-      <Typography variant='h2'>
-        Responsable
-      </Typography>
-      <div style={ label }>
-        Name
-      </div>
-      <Typography variant='body1'>{ data.responsableName }</Typography>
-      <div style={ label }>
-        Position
-      </div>
-      <Typography variant='body1'>{ data.responsablePosition }</Typography>
-      <div style={ label }>
-        Email
-      </div>
-      <Typography variant='body1'>{ data.responsableEmail }</Typography>
+      <Typography variant="h2">Responsable</Typography>
+      <div style={label}>Name</div>
+      <Typography variant="body1">{data.responsableName}</Typography>
+      <div style={label}>Position</div>
+      <Typography variant="body1">{data.responsablePosition}</Typography>
+      <div style={label}>Email</div>
+      <Typography variant="body1">{data.responsableEmail}</Typography>
     </Grid>
   )
 }
@@ -137,7 +140,7 @@ const saveFile = (filename, blob) => {
   const blobUrl = URL.createObjectURL(blob)
 
   // create temp link element
-  let link = document.createElement('a')
+  let link = document.createElement("a")
   link.download = filename
   link.href = blobUrl
 
@@ -153,9 +156,9 @@ const saveFile = (filename, blob) => {
   }, 0)
 }
 
-const downloadFile = async data => {
+const downloadFile = async (data) => {
   // Read template file
-  const resp = await fetch('/template.docx')
+  const resp = await fetch("/template.docx")
   const templateFile = await resp.blob()
 
   // Process the template
@@ -163,13 +166,15 @@ const downloadFile = async data => {
   const doc = await handler.process(templateFile, data)
 
   // Save output
-  saveFile('output.docx', doc)
+  saveFile("output.docx", doc)
 }
 
-const toDocumentData = data => {
-  if (data.schoolTelephone.length > 9
-    || data.schoolRUC.length > 11
-    || data.schoolTelephone.length > 9) {
+const toDocumentData = (data) => {
+  if (
+    data.schoolTelephone.length > 9 ||
+    data.schoolRUC.length > 11 ||
+    data.schoolTelephone.length > 9
+  ) {
     return null
   }
 
@@ -181,7 +186,6 @@ const toDocumentData = data => {
 
     school: data.schoolName,
     address: data.schoolAddress,
-
 
     telephone1: data.schoolTelephone[0],
     telephone2: data.schoolTelephone[1],
@@ -227,15 +231,18 @@ function Order({ params }) {
   const [, setLocation] = useLocation()
   const { throwError } = useError()
 
-  const { getOrder: [getOrder, order, loading, error], deleteOrder } = useOrders()
+  const {
+    getOrder: [getOrder, order, loading, error],
+    deleteOrder,
+  } = useOrders()
   const data = order
 
   useEffect(() => {
     const requestOrder = async () => {
       const data = await getOrder(id)
       if (!data) {
-        throwError('Order does not exists')
-        setLocation('/')
+        throwError("Order does not exists")
+        setLocation("/")
       }
     }
     requestOrder()
@@ -243,8 +250,8 @@ function Order({ params }) {
 
   useEffect(() => {
     if (error) {
-      throwError('Error loading order')
-      setLocation('/')
+      throwError("Error loading order")
+      setLocation("/")
     }
   }, [error, throwError, setLocation])
 
@@ -254,32 +261,34 @@ function Order({ params }) {
 
   const handleDelete = () => {
     deleteOrder(id)
-    setLocation('/')
+    setLocation("/")
   }
 
   return (
-    <Container maxWidth='xs'>
+    <Container maxWidth="xs">
       <OrderToolBar
-        data={ data }
-        loading={ loading }
-        onClickDownload={ handleClickDownload }
+        data={data}
+        loading={loading}
+        onClickDownload={handleClickDownload}
       />
 
-      <OrderDetails
-        data={ data }
-        loading={ loading }
-      />
+      <OrderDetails data={data} loading={loading} />
 
-      <Grid container direction='column'>
+      <Grid container direction="column">
         <Grid item>
-          <Link href={ `/edit/${ id }` }>
-            <Button variant='contained' color='primary' fullWidth>
+          <Link href={`/edit/${id}`}>
+            <Button variant="contained" color="primary" fullWidth>
               Modify
             </Button>
           </Link>
         </Grid>
-        <Grid item style={ { marginTop: '0.5rem' } }>
-          <Button variant='contained' color='secondary' fullWidth onClick={ handleDelete }>
+        <Grid item style={{ marginTop: "0.5rem" }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            fullWidth
+            onClick={handleDelete}
+          >
             Delete
           </Button>
         </Grid>
