@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "wouter"
+import MaterialTable from "material-table"
 
 import {
   Grid,
@@ -12,14 +13,14 @@ import {
   TextField,
   CircularProgress,
 } from "@material-ui/core"
-
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers"
-import DateFnsUtils from "@date-io/date-fns"
-
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+
+import DateFnsUtils from "@date-io/date-fns"
 
 import { useOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
+import tableIcons from "../utils/tableIcons"
 
 function EditForm({ data, onSubmit }) {
   const [orderNumber, setOrderNumber] = useState(data.orderNumber)
@@ -39,6 +40,8 @@ function EditForm({ data, onSubmit }) {
     data.responsableEmail
   )
 
+  const [inicialOrders, setInicialOrders] = useState(data.inicialOrders)
+
   const handleClick = () => {
     onSubmit({
       orderNumber,
@@ -51,6 +54,7 @@ function EditForm({ data, onSubmit }) {
       responsableName,
       responsablePosition,
       responsableEmail,
+      inicialOrders,
     })
   }
 
@@ -197,6 +201,49 @@ function EditForm({ data, onSubmit }) {
           />
         </Grid>
       </Grid>
+
+      {/*-- Inicial --*/}
+      <Grid
+        container
+        direction="column"
+        style={{ marginTop: "1rem", marginBottom: "1rem" }}
+        spacing={1}
+      >
+        <Grid item>
+          <Typography variant="h2">Inicial</Typography>
+        </Grid>
+        <Grid container item>
+          <MaterialTable
+            style={{
+              width: "100%",
+            }}
+            columns={[
+              { title: "Titulo", field: "name" },
+              { title: "Editorial", field: "editorial" },
+              { title: "2 años", field: "count2", type: "numeric" },
+              { title: "3 años", field: "count3", type: "numeric" },
+              { title: "4 años", field: "count4", type: "numeric" },
+              { title: "5 años", field: "count5", type: "numeric" },
+            ]}
+            data={inicialOrders}
+            editable={{
+              onRowUpdate: async (newData, oldData) => {
+                const dataUpdate = [...inicialOrders]
+                const index = oldData.tableData.id
+                dataUpdate[index] = newData
+                setInicialOrders([...dataUpdate])
+              },
+            }}
+            options={{
+              toolbar: false,
+              paging: false,
+            }}
+            icons={tableIcons}
+          />
+        </Grid>
+      </Grid>
+
+      {/*-- Operations --*/}
       <Grid container direction="column">
         <Grid item>
           <Button
@@ -220,10 +267,9 @@ function Edit({ params }) {
   const { throwError } = useError()
 
   const {
-    getOrder: [getOrder, order, loading, error],
+    getOrder: [getOrder, data, loading, error],
     editOrder,
   } = useOrders()
-  const data = order
 
   useEffect(() => {
     const requestOrder = async () => {
@@ -255,6 +301,7 @@ function Edit({ params }) {
       responsableName: data.responsableName,
       responsablePosition: data.responsablePosition,
       responsableEmail: data.responsableEmail,
+      inicialOrders: data.inicialOrders,
     })
     setLocation(`/order/${id}`)
   }

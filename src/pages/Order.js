@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
+import MaterialTable from "material-table"
 
 import {
   Grid,
@@ -20,6 +21,7 @@ import ShareIcon from "@material-ui/icons/Share"
 
 import { useOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
+import tableIcons from "../utils/tableIcons"
 
 function OrderToolBar({ data, loading, onClickDownload }) {
   return (
@@ -129,6 +131,27 @@ function OrderDetails({ data, loading }) {
       <Typography variant="body1">{data.responsablePosition}</Typography>
       <div style={label}>Email</div>
       <Typography variant="body1">{data.responsableEmail}</Typography>
+
+      <Typography variant="h2">Inicial</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Editorial", field: "editorial" },
+          { title: "2 años", field: "count2", type: "numeric" },
+          { title: "3 años", field: "count3", type: "numeric" },
+          { title: "4 años", field: "count4", type: "numeric" },
+          { title: "5 años", field: "count5", type: "numeric" },
+        ]}
+        data={data.inicialOrders}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+      />
     </Grid>
   )
 }
@@ -222,6 +245,8 @@ const toDocumentData = (data) => {
     responsableName: data.responsableName,
     responsablePosition: data.responsablePosition,
     responsableEmail: data.responsableEmail,
+
+    InicialOrders: data.inicialOrders,
   }
 }
 
@@ -232,10 +257,9 @@ function Order({ params }) {
   const { throwError } = useError()
 
   const {
-    getOrder: [getOrder, order, loading, error],
+    getOrder: [getOrder, data, loading, error],
     deleteOrder,
   } = useOrders()
-  const data = order
 
   useEffect(() => {
     const requestOrder = async () => {

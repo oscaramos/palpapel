@@ -22,6 +22,32 @@ const createOrder = async () => {
     responsablePosition: "Nop",
     responsableEmail: "haha",
     uid: auth.currentUser.uid,
+    inicialOrders: [
+      {
+        name: "Book 1",
+        editorial: "Editorial 1",
+        count2: 0,
+        count3: 0,
+        count4: 15,
+        count5: 0,
+      },
+      {
+        name: "Book 2",
+        editorial: "Editorial 2",
+        count2: 0,
+        count3: 0,
+        count4: 15,
+        count5: 0,
+      },
+      {
+        name: "Book 3",
+        editorial: "Editorial 3",
+        count2: 0,
+        count3: 0,
+        count4: 15,
+        count5: 0,
+      },
+    ],
   })
 }
 
