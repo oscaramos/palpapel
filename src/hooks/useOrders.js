@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { format } from 'date-fns'
 
-import useFirestoreLoadMore from './useFirestoreLoadMore'
 import { auth, firestore } from '../firebase.utils'
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore'
 
@@ -32,33 +31,6 @@ function useGetAllOrders() {
   return [orders, loading, error]
 }
 
-function useGetPaginatedOrders() {
-  const [user] = useAuthState(auth)
-
-  const queryFn = React.useCallback(() => {
-    let q = firestore
-      .collection('orders')
-      .orderBy('orderNumber')
-      .limit(3)
-
-    if (user) {
-      q = q.where('uid', '==', user?.uid ?? null)
-    }
-
-    return q
-  }, [user])
-
-  const [[rawOrders, loading, error], loadMore, loadAgain] = useFirestoreLoadMore(queryFn)
-
-  // Transform the order format in firebase to app format
-  const orders = rawOrders
-    // Convert snapshot to documents with id
-    ?.map(doc => ({ id: doc.id, ...doc.data() }))
-    .map(fromFirestoreDocument)
-
-  return [orders, loading, error, loadMore, loadAgain]
-}
-
 function useGetOrder() {
   const [orderId, setOrderId] = useState('')
   const [rawOrder, loading, error] = useDocumentData(
@@ -81,8 +53,6 @@ function useGetOrder() {
 }
 
 export function OrdersProvider({ children }) {
-  const [orders, loading, error, loadMore, loadAgain] = useGetPaginatedOrders()
-
   const createOrder = async () => {
     const res = await firestore.collection('orders').add({
       orderDate: new Date(),
@@ -95,10 +65,8 @@ export function OrdersProvider({ children }) {
       responsableName: "Irresponsable",
       responsablePosition: "Nop",
       responsableEmail: "haha",
-      uid: auth.currentUser
+      uid: auth.currentUser.uid
     })
-
-    loadAgain()
 
     return res
   }
@@ -106,20 +74,17 @@ export function OrdersProvider({ children }) {
   const editOrder = async (id, data) => {
     const docRef = firestore.collection('orders').doc(id)
     await docRef.update(data)
-    loadAgain()
   }
 
   const deleteOrder = async (id) => {
     const docRef = firestore.collection('orders').doc(id)
     await docRef.delete()
-    loadAgain()
   }
 
   return (
     <OrdersContext.Provider value={
       {
         getAllOrders: useGetAllOrders(),
-        getPaginatedOrders: [orders, loading, error, loadMore],
         getOrder: useGetOrder(),
         createOrder,
         editOrder,

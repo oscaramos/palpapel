@@ -73,17 +73,13 @@ function SharedWithMe() {
       <Grid container direction='column' spacing={1} style={ { marginTop: '0.5rem', marginBottom: '0.5rem' } }>
 
       </Grid>
-
-      <Button variant='outlined' fullWidth>
-        See More
-      </Button>
     </Grid>
   )
 }
 
 function Operations() {
   const [, setLocation] = useLocation()
-  const { getPaginatedOrders: [orders, loading, error, loadMore], createOrder } = useOrders()
+  const { getAllOrders: [orders, loading, error], createOrder } = useOrders()
 
   const handleCreateOrder = async () => {
     const res = await createOrder()
@@ -97,9 +93,6 @@ function Operations() {
         loading={loading}
         error={error}
       />
-      <Button variant='outlined' fullWidth onClick={loadMore}>
-        See More
-      </Button>
 
       <SharedWithMe />
 
