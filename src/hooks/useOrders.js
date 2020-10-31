@@ -1,10 +1,44 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useCallback, useContext, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { format } from 'date-fns'
 
 import { auth, firestore } from '../firebase.utils'
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore'
 
+/*-- Firebase utils functions --*/
+const createOrder = async () => {
+  return await firestore.collection('orders').add({
+    orderDate: new Date(),
+    orderNumber: '010',
+    schoolName: 'School',
+    schoolAddress: 'Address',
+    schoolRUC: '123',
+    schoolTelephone: '123',
+    schoolCellphone: '123',
+    responsableName: 'Irresponsable',
+    responsablePosition: 'Nop',
+    responsableEmail: 'haha',
+    uid: auth.currentUser.uid,
+  })
+}
+
+const getOrder = async id => {
+  const docRef = firestore.collection('orders').doc(id)
+  const doc = await docRef.get()
+  return doc.data()
+}
+
+const editOrder = async (id, data) => {
+  const docRef = firestore.collection('orders').doc(id)
+  await docRef.update(data)
+}
+
+const deleteOrder = async id => {
+  const docRef = firestore.collection('orders').doc(id)
+  await docRef.delete()
+}
+
+/*-- useOrders hook --*/
 const OrdersContext = createContext(undefined)
 
 const fromFirestoreDocument = order => ({
@@ -22,8 +56,8 @@ function useGetAllOrders() {
       .orderBy('orderNumber')
       .where('uid', '==', user?.uid ?? null),
     {
-      idField: 'id'
-    }
+      idField: 'id',
+    },
   )
 
   const orders = rawOrders?.map(fromFirestoreDocument)
@@ -34,53 +68,25 @@ function useGetAllOrders() {
 function useGetOrder() {
   const [orderId, setOrderId] = useState('')
   const [rawOrder, loading, error] = useDocumentData(
-    firestore.collection('orders').doc(orderId ||  ' '),
+    firestore.collection('orders').doc(orderId || ' '),
     {
-      idField: 'id'
-    }
+      idField: 'id',
+    },
   )
 
-  const order = rawOrder? fromFirestoreDocument(
-    rawOrder
-  ): null
+  const order = rawOrder ? fromFirestoreDocument(
+    rawOrder,
+  ) : null
 
-
-  const getOrder = id => {
+  const getOrderWrapper = useCallback(async (id) => {
     setOrderId(id)
-  }
+    return await getOrder(id)
+  }, [setOrderId])
 
-  return [getOrder, order, loading, error]
+  return [getOrderWrapper, order, loading, error]
 }
 
 export function OrdersProvider({ children }) {
-  const createOrder = async () => {
-    const res = await firestore.collection('orders').add({
-      orderDate: new Date(),
-      orderNumber: "010",
-      schoolName: "School",
-      schoolAddress: "Address",
-      schoolRUC: "123",
-      schoolTelephone: "123",
-      schoolCellphone: "123",
-      responsableName: "Irresponsable",
-      responsablePosition: "Nop",
-      responsableEmail: "haha",
-      uid: auth.currentUser.uid
-    })
-
-    return res
-  }
-
-  const editOrder = async (id, data) => {
-    const docRef = firestore.collection('orders').doc(id)
-    await docRef.update(data)
-  }
-
-  const deleteOrder = async (id) => {
-    const docRef = firestore.collection('orders').doc(id)
-    await docRef.delete()
-  }
-
   return (
     <OrdersContext.Provider value={
       {
@@ -88,7 +94,7 @@ export function OrdersProvider({ children }) {
         getOrder: useGetOrder(),
         createOrder,
         editOrder,
-        deleteOrder
+        deleteOrder,
       }
     }>
       { children }

@@ -22,6 +22,7 @@ import DateFnsUtils from '@date-io/date-fns'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 
 import { useOrders } from '../hooks/useOrders'
+import { useError } from '../hooks/useError'
 
 function EditForm({ data, onSubmit }) {
   const [orderNumber, setOrderNumber] = useState(data.orderNumber)
@@ -218,12 +219,28 @@ function Edit({ params }) {
   const { id } = params
 
   const [, setLocation] = useLocation()
+  const { throwError } = useError()
+
   const { getOrder: [getOrder, order, loading, error], editOrder } = useOrders()
   const data = order
 
   useEffect(() => {
-    getOrder(id)
-  }, [getOrder, id])
+    const requestOrder = async () => {
+      const data = await getOrder(id)
+      if (!data) {
+        throwError('Order does not exists')
+        setLocation('/')
+      }
+    }
+    requestOrder()
+  }, [getOrder, id, setLocation, throwError])
+
+  useEffect(() => {
+    if (error) {
+      throwError('Error loading order')
+      setLocation('/')
+    }
+  }, [error, throwError, setLocation])
 
   const handleSave = data => {
     editOrder(id, {

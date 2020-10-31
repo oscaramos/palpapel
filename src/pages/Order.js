@@ -19,6 +19,7 @@ import PrintIcon from '@material-ui/icons/Print'
 import ShareIcon from '@material-ui/icons/Share'
 
 import { useOrders } from '../hooks/useOrders'
+import { useError } from '../hooks/useError'
 
 function OrderToolBar({ data, loading, onClickDownload }) {
   return (
@@ -222,14 +223,30 @@ const toDocumentData = data => {
 
 function Order({ params }) {
   const { id } = params
+
   const [, setLocation] = useLocation()
+  const { throwError } = useError()
 
   const { getOrder: [getOrder, order, loading, error], deleteOrder } = useOrders()
   const data = order
 
   useEffect(() => {
-    getOrder(id)
-  }, [getOrder, id])
+    const requestOrder = async () => {
+      const data = await getOrder(id)
+      if (!data) {
+        throwError('Order does not exists')
+        setLocation('/')
+      }
+    }
+    requestOrder()
+  }, [getOrder, id, setLocation, throwError])
+
+  useEffect(() => {
+    if (error) {
+      throwError('Error loading order')
+      setLocation('/')
+    }
+  }, [error, throwError, setLocation])
 
   const handleClickDownload = () => {
     downloadFile(toDocumentData(data))
