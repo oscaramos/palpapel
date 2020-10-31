@@ -152,6 +152,68 @@ function OrderDetails({ data, loading }) {
         }}
         icons={tableIcons}
       />
+
+      <Typography variant="h2">Primaria</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Editorial", field: "editorial" },
+          { title: "1ero", field: "count1", type: "numeric" },
+          { title: "2do", field: "count2", type: "numeric" },
+          { title: "3ero", field: "count3", type: "numeric" },
+          { title: "4to", field: "count4", type: "numeric" },
+          { title: "5to", field: "count5", type: "numeric" },
+          { title: "6to", field: "count6", type: "numeric" },
+        ]}
+        data={data.primariaOrders}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+      />
+
+      <Typography variant="h2">Secundaria</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Editorial", field: "editorial" },
+          { title: "1ero", field: "count1", type: "numeric" },
+          { title: "2do", field: "count2", type: "numeric" },
+          { title: "3ero", field: "count3", type: "numeric" },
+          { title: "4to", field: "count4", type: "numeric" },
+          { title: "5to", field: "count5", type: "numeric" },
+        ]}
+        data={data.secundariaOrders}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+      />
+
+      <Typography variant="h2">Otros</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Cantidad", field: "count", type: "numeric" },
+        ]}
+        data={data.otrosOrders}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+      />
     </Grid>
   )
 }
@@ -247,6 +309,10 @@ const toDocumentData = (data) => {
     responsableEmail: data.responsableEmail,
 
     InicialOrders: data.inicialOrders,
+    PrimariaOrders: data.primariaOrders,
+    SecundariaOrders: data.secundariaOrders,
+    OtrosOrders1: data.otrosOrders.slice(0, 9),
+    OtrosOrders2: data.otrosOrders.slice(9, 18),
   }
 }
 

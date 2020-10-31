@@ -41,6 +41,11 @@ function EditForm({ data, onSubmit }) {
   )
 
   const [inicialOrders, setInicialOrders] = useState(data.inicialOrders)
+  const [primariaOrders, setPrimariaOrders] = useState(data.primariaOrders)
+  const [secundariaOrders, setSecundariaOrders] = useState(
+    data.secundariaOrders
+  )
+  const [otrosOrders, setOtrosOrders] = useState(data.otrosOrders)
 
   const handleClick = () => {
     onSubmit({
@@ -55,6 +60,9 @@ function EditForm({ data, onSubmit }) {
       responsablePosition,
       responsableEmail,
       inicialOrders,
+      primariaOrders,
+      secundariaOrders,
+      otrosOrders,
     })
   }
 
@@ -243,6 +251,128 @@ function EditForm({ data, onSubmit }) {
         </Grid>
       </Grid>
 
+      {/*-- Primaria --*/}
+      <Grid
+        container
+        direction="column"
+        style={{ marginTop: "1rem", marginBottom: "1rem" }}
+        spacing={1}
+      >
+        <Grid item>
+          <Typography variant="h2">Primaria</Typography>
+        </Grid>
+        <Grid container item>
+          <MaterialTable
+            style={{
+              width: "100%",
+            }}
+            columns={[
+              { title: "Titulo", field: "name" },
+              { title: "Editorial", field: "editorial" },
+              { title: "1ero", field: "count1", type: "numeric" },
+              { title: "2do", field: "count2", type: "numeric" },
+              { title: "3ero", field: "count3", type: "numeric" },
+              { title: "4to", field: "count4", type: "numeric" },
+              { title: "5to", field: "count5", type: "numeric" },
+              { title: "6to", field: "count6", type: "numeric" },
+            ]}
+            data={primariaOrders}
+            editable={{
+              onRowUpdate: async (newData, oldData) => {
+                const dataUpdate = [...primariaOrders]
+                const index = oldData.tableData.id
+                dataUpdate[index] = newData
+                setPrimariaOrders([...dataUpdate])
+              },
+            }}
+            options={{
+              toolbar: false,
+              paging: false,
+            }}
+            icons={tableIcons}
+          />
+        </Grid>
+      </Grid>
+
+      {/*-- Secundaria --*/}
+      <Grid
+        container
+        direction="column"
+        style={{ marginTop: "1rem", marginBottom: "1rem" }}
+        spacing={1}
+      >
+        <Grid item>
+          <Typography variant="h2">Secundaria</Typography>
+        </Grid>
+        <Grid container item>
+          <MaterialTable
+            style={{
+              width: "100%",
+            }}
+            columns={[
+              { title: "Titulo", field: "name" },
+              { title: "Editorial", field: "editorial" },
+              { title: "1ero", field: "count1", type: "numeric" },
+              { title: "2do", field: "count2", type: "numeric" },
+              { title: "3ero", field: "count3", type: "numeric" },
+              { title: "4to", field: "count4", type: "numeric" },
+              { title: "5to", field: "count5", type: "numeric" },
+            ]}
+            data={secundariaOrders}
+            editable={{
+              onRowUpdate: async (newData, oldData) => {
+                const dataUpdate = [...secundariaOrders]
+                const index = oldData.tableData.id
+                dataUpdate[index] = newData
+                setSecundariaOrders([...dataUpdate])
+              },
+            }}
+            options={{
+              toolbar: false,
+              paging: false,
+            }}
+            icons={tableIcons}
+          />
+        </Grid>
+      </Grid>
+
+      {/*-- Otros --*/}
+      <Grid
+        container
+        direction="column"
+        style={{ marginTop: "1rem", marginBottom: "1rem" }}
+        spacing={1}
+      >
+        <Grid item>
+          <Typography variant="h2">Otros</Typography>
+        </Grid>
+        <Grid container item>
+          <MaterialTable
+            style={{
+              width: "100%",
+            }}
+            columns={[
+              { title: "Titulo", field: "name" },
+              { title: "Cantidad", field: "count", type: "numeric" },
+            ]}
+            data={otrosOrders}
+            editable={{
+              onRowUpdate: async (newData, oldData) => {
+                const dataUpdate = [...otrosOrders]
+                const index = oldData.tableData.id
+                dataUpdate[index] = newData
+                setOtrosOrders([...dataUpdate])
+              },
+            }}
+            options={{
+              toolbar: false,
+              paging: false,
+            }}
+            icons={tableIcons}
+          />
+        </Grid>
+      </Grid>
+
       {/*-- Operations --*/}
       <Grid container direction="column">
         <Grid item>
@@ -302,6 +432,9 @@ function Edit({ params }) {
       responsablePosition: data.responsablePosition,
       responsableEmail: data.responsableEmail,
       inicialOrders: data.inicialOrders,
+      primariaOrders: data.primariaOrders,
+      secundariaOrders: data.secundariaOrders,
+      otrosOrders: data.otrosOrders,
     })
     setLocation(`/order/${id}`)
   }
