@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 /**
  * Sync state to local storage so that it persists through a page refresh.
@@ -45,7 +45,7 @@ function useLocalStorage(key, initialValue) {
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.
-  const setValue = value => {
+  const setValue = (value) => {
     try {
       // Allow value to be a function so we have same API as useState
       const valueToStore =
@@ -63,4 +63,4 @@ function useLocalStorage(key, initialValue) {
   return [storedValue, setValue];
 }
 
-export default useLocalStorage
+export default useLocalStorage;
