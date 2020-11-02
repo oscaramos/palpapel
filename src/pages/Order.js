@@ -38,12 +38,7 @@ function OrderToolBar({ data, loading, onClickDownload }) {
       }}
     >
       <Toolbar style={{ color: "black" }} disableGutters>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="center"
-        >
+        <Grid container direction="row" justify="space-between" alignItems="center">
           <Grid item>
             <Link href="/">
               <IconButton>
@@ -53,18 +48,8 @@ function OrderToolBar({ data, loading, onClickDownload }) {
           </Grid>
           {loading ? (
             <Grid item>
-              <Grid
-                container
-                direction="column"
-                justify="center"
-                alignItems="center"
-              >
-                <Skeleton
-                  variant="rect"
-                  width={120}
-                  height={20}
-                  style={{ marginBottom: "1rem" }}
-                />
+              <Grid container direction="column" justify="center" alignItems="center">
+                <Skeleton variant="rect" width={120} height={20} style={{ marginBottom: "1rem" }} />
                 <Skeleton variant="rect" width={100} height={15} />
               </Grid>
             </Grid>
@@ -90,6 +75,14 @@ function OrderToolBar({ data, loading, onClickDownload }) {
       </Toolbar>
     </AppBar>
   )
+}
+
+const hideIfEmpty = (cellData) => {
+  if (!cellData) {
+    return {
+      color: "transparent",
+    }
+  }
 }
 
 function OrderDetails({ data, loading }) {
@@ -137,15 +130,16 @@ function OrderDetails({ data, loading }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "2 años", field: "count2", type: "numeric" },
-          { title: "3 años", field: "count3", type: "numeric" },
-          { title: "4 años", field: "count4", type: "numeric" },
-          { title: "5 años", field: "count5", type: "numeric" },
+          { title: "2 años", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "3 años", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "4 años", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "5 años", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={data.inicialOrders}
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -159,17 +153,18 @@ function OrderDetails({ data, loading }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "1ero", field: "count1", type: "numeric" },
-          { title: "2do", field: "count2", type: "numeric" },
-          { title: "3ero", field: "count3", type: "numeric" },
-          { title: "4to", field: "count4", type: "numeric" },
-          { title: "5to", field: "count5", type: "numeric" },
-          { title: "6to", field: "count6", type: "numeric" },
+          { title: "1ero", field: "count1", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "2do", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "3ero", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "4to", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "5to", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "6to", field: "count6", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={data.primariaOrders}
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -183,16 +178,17 @@ function OrderDetails({ data, loading }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "1ero", field: "count1", type: "numeric" },
-          { title: "2do", field: "count2", type: "numeric" },
-          { title: "3ero", field: "count3", type: "numeric" },
-          { title: "4to", field: "count4", type: "numeric" },
-          { title: "5to", field: "count5", type: "numeric" },
+          { title: "1ero", field: "count1", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "2do", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "3ero", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "4to", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "5to", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={data.secundariaOrders}
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -205,12 +201,13 @@ function OrderDetails({ data, loading }) {
         }}
         columns={[
           { title: "Titulo", field: "name" },
-          { title: "Cantidad", field: "count", type: "numeric" },
+          { title: "Cantidad", field: "count", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={data.otrosOrders}
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -349,11 +346,7 @@ function Order({ params }) {
 
   return (
     <Container maxWidth="sm">
-      <OrderToolBar
-        data={data}
-        loading={loading}
-        onClickDownload={handleClickDownload}
-      />
+      <OrderToolBar data={data} loading={loading} onClickDownload={handleClickDownload} />
 
       <OrderDetails data={data} loading={loading} />
 
@@ -366,12 +359,7 @@ function Order({ params }) {
           </Link>
         </Grid>
         <Grid item style={{ marginTop: "0.5rem" }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            onClick={handleDelete}
-          >
+          <Button variant="contained" color="secondary" fullWidth onClick={handleDelete}>
             Eliminar
           </Button>
         </Grid>

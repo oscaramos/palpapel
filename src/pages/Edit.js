@@ -25,6 +25,14 @@ import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
 
+const hideIfEmpty = (cellData) => {
+  if (!cellData) {
+    return {
+      color: "transparent",
+    }
+  }
+}
+
 function EditForm({ data, onSubmit }) {
   const { register, errors, handleSubmit } = useForm()
 
@@ -32,9 +40,7 @@ function EditForm({ data, onSubmit }) {
 
   const [inicialOrders, setInicialOrders] = useState(data.inicialOrders)
   const [primariaOrders, setPrimariaOrders] = useState(data.primariaOrders)
-  const [secundariaOrders, setSecundariaOrders] = useState(
-    data.secundariaOrders
-  )
+  const [secundariaOrders, setSecundariaOrders] = useState(data.secundariaOrders)
   const [otrosOrders, setOtrosOrders] = useState(data.otrosOrders)
 
   const onSubmitInternal = (data) => {
@@ -106,11 +112,7 @@ function EditForm({ data, onSubmit }) {
         name="schoolRUC"
         inputRef={register({ required: true, maxLength: 11 })}
         error={Boolean(errors.schoolRUC)}
-        helperText={
-          Boolean(errors.schoolRUC)
-            ? "El RUC debe contener hasta 11 dígitos"
-            : null
-        }
+        helperText={Boolean(errors.schoolRUC) ? "El RUC debe contener hasta 11 dígitos" : null}
         defaultValue={data.schoolRUC}
         fullWidth
       />
@@ -121,9 +123,7 @@ function EditForm({ data, onSubmit }) {
         inputRef={register({ required: true, maxLength: 6 })}
         error={Boolean(errors.schoolTelephone)}
         helperText={
-          Boolean(errors.schoolTelephone)
-            ? "El teléfono debe contener hasta 6 dígitos"
-            : null
+          Boolean(errors.schoolTelephone) ? "El teléfono debe contener hasta 6 dígitos" : null
         }
         defaultValue={data.schoolTelephone}
         fullWidth
@@ -135,9 +135,7 @@ function EditForm({ data, onSubmit }) {
         inputRef={register({ required: true, maxLength: 9 })}
         error={Boolean(errors.schoolCellphone)}
         helperText={
-          Boolean(errors.schoolCellphone)
-            ? "El celular debe contener hasta 9 dígitos"
-            : null
+          Boolean(errors.schoolCellphone) ? "El celular debe contener hasta 9 dígitos" : null
         }
         defaultValue={data.schoolCellphone}
         fullWidth
@@ -181,10 +179,10 @@ function EditForm({ data, onSubmit }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "2 años", field: "count2", type: "numeric" },
-          { title: "3 años", field: "count3", type: "numeric" },
-          { title: "4 años", field: "count4", type: "numeric" },
-          { title: "5 años", field: "count5", type: "numeric" },
+          { title: "2 años", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "3 años", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "4 años", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "5 años", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={inicialOrders}
         editable={{
@@ -198,6 +196,7 @@ function EditForm({ data, onSubmit }) {
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -212,12 +211,12 @@ function EditForm({ data, onSubmit }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "1ero", field: "count1", type: "numeric" },
-          { title: "2do", field: "count2", type: "numeric" },
-          { title: "3ero", field: "count3", type: "numeric" },
-          { title: "4to", field: "count4", type: "numeric" },
-          { title: "5to", field: "count5", type: "numeric" },
-          { title: "6to", field: "count6", type: "numeric" },
+          { title: "1ero", field: "count1", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "2do", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "3ero", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "4to", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "5to", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "6to", field: "count6", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={primariaOrders}
         editable={{
@@ -231,6 +230,7 @@ function EditForm({ data, onSubmit }) {
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -245,11 +245,11 @@ function EditForm({ data, onSubmit }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "1ero", field: "count1", type: "numeric" },
-          { title: "2do", field: "count2", type: "numeric" },
-          { title: "3ero", field: "count3", type: "numeric" },
-          { title: "4to", field: "count4", type: "numeric" },
-          { title: "5to", field: "count5", type: "numeric" },
+          { title: "1ero", field: "count1", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "2do", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "3ero", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "4to", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "5to", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={secundariaOrders}
         editable={{
@@ -263,6 +263,7 @@ function EditForm({ data, onSubmit }) {
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -276,7 +277,7 @@ function EditForm({ data, onSubmit }) {
         }}
         columns={[
           { title: "Titulo", field: "name" },
-          { title: "Cantidad", field: "count", type: "numeric" },
+          { title: "Cantidad", field: "count", type: "numeric", cellStyle: hideIfEmpty },
         ]}
         data={otrosOrders}
         editable={{
@@ -290,6 +291,7 @@ function EditForm({ data, onSubmit }) {
         options={{
           toolbar: false,
           paging: false,
+          sorting: false,
         }}
         icons={tableIcons}
         localization={tableLocalization}
@@ -388,9 +390,7 @@ function Edit({ params }) {
       </AppBar>
 
       {loading ? (
-        <div
-          style={{ width: "100%", display: "flex", justifyContent: "center" }}
-        >
+        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
           <CircularProgress style={{ alignText: "center" }} />
         </div>
       ) : data ? (
