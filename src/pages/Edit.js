@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "wouter"
+import { useForm } from "react-hook-form"
 import MaterialTable from "material-table"
 import esLocale from "date-fns/locale/es"
 
@@ -25,22 +26,9 @@ import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
 
 function EditForm({ data, onSubmit }) {
-  const [orderNumber, setOrderNumber] = useState(data.orderNumber)
+  const { register, errors, handleSubmit } = useForm()
+
   const [orderDate, handleOrderDateChange] = useState(data.orderDate)
-
-  const [schoolName, setSchoolName] = useState(data.schoolName)
-  const [schoolAddress, setSchoolAddress] = useState(data.schoolAddress)
-  const [schoolRUC, setSchoolRUC] = useState(data.schoolRUC)
-  const [schoolTelephone, setSchoolTelephone] = useState(data.schoolTelephone)
-  const [schoolCellphone, setSchoolCellphone] = useState(data.schoolCellphone)
-
-  const [responsableName, setResponsableName] = useState(data.responsableName)
-  const [responsablePosition, setResponsablePosition] = useState(
-    data.responsablePosition
-  )
-  const [responsableEmail, setResponsableEmail] = useState(
-    data.responsableEmail
-  )
 
   const [inicialOrders, setInicialOrders] = useState(data.inicialOrders)
   const [primariaOrders, setPrimariaOrders] = useState(data.primariaOrders)
@@ -49,18 +37,18 @@ function EditForm({ data, onSubmit }) {
   )
   const [otrosOrders, setOtrosOrders] = useState(data.otrosOrders)
 
-  const handleClick = () => {
+  const onSubmitInternal = (data) => {
     onSubmit({
-      orderNumber,
+      orderNumber: data.orderNumber,
       orderDate,
-      schoolName,
-      schoolAddress,
-      schoolRUC,
-      schoolTelephone,
-      schoolCellphone,
-      responsableName,
-      responsablePosition,
-      responsableEmail,
+      schoolName: data.schoolName,
+      schoolAddress: data.schoolAddress,
+      schoolRUC: data.schoolRUC,
+      schoolTelephone: data.schoolTelephone,
+      schoolCellphone: data.schoolCellphone,
+      responsableName: data.responsableName,
+      responsablePosition: data.responsablePosition,
+      responsableEmail: data.responsableEmail,
       inicialOrders,
       primariaOrders,
       secundariaOrders,
@@ -69,295 +57,255 @@ function EditForm({ data, onSubmit }) {
   }
 
   return (
-    <Grid container direction="column">
+    <form
+      style={{ display: "flex", flexDirection: "column", gap: 8 }}
+      onSubmit={handleSubmit(onSubmitInternal)}
+    >
       {/*-- Order --*/}
-      <Grid item container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h2">Orden</Typography>
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Número"
-            placeholder="000001"
-            fullWidth
-            value={orderNumber}
-            onChange={(e) => setOrderNumber(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
-            <DatePicker
-              label="Fecha"
-              value={orderDate}
-              onChange={handleOrderDateChange}
-              inputVariant="outlined"
-              fullWidth
-            />
-          </MuiPickersUtilsProvider>
-        </Grid>
-      </Grid>
+      <Typography variant="h2">Orden</Typography>
+      <TextField
+        variant="outlined"
+        label="Número"
+        placeholder="000001"
+        fullWidth
+        name="orderNumber"
+        inputRef={register}
+        defaultValue={data.orderNumber}
+      />
+      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
+        <DatePicker
+          label="Fecha"
+          value={orderDate}
+          onChange={handleOrderDateChange}
+          inputVariant="outlined"
+          fullWidth
+        />
+      </MuiPickersUtilsProvider>
 
       {/*-- School --*/}
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h2">Colegio</Typography>
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Nombre"
-            placeholder=""
-            fullWidth
-            value={schoolName}
-            onChange={(e) => setSchoolName(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Dirección"
-            placeholder=""
-            fullWidth
-            value={schoolAddress}
-            onChange={(e) => setSchoolAddress(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="RUC"
-            placeholder=""
-            fullWidth
-            value={schoolRUC}
-            onChange={(e) => setSchoolRUC(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Teléfono"
-            placeholder=""
-            fullWidth
-            value={schoolTelephone}
-            onChange={(e) => setSchoolTelephone(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Celular"
-            placeholder="(704) 555-0120"
-            fullWidth
-            value={schoolCellphone}
-            onChange={(e) => setSchoolCellphone(e.target.value)}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h2">Colegio</Typography>
+      <TextField
+        variant="outlined"
+        label="Nombre"
+        name="schoolName"
+        inputRef={register}
+        defaultValue={data.schoolName}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Dirección"
+        name="schoolAddress"
+        inputRef={register}
+        defaultValue={data.schoolAddress}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="RUC"
+        name="schoolRUC"
+        inputRef={register({ required: true, maxLength: 11 })}
+        error={Boolean(errors.schoolRUC)}
+        helperText={
+          Boolean(errors.schoolRUC)
+            ? "El RUC debe contener hasta 11 dígitos"
+            : null
+        }
+        defaultValue={data.schoolRUC}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Teléfono fijo"
+        name="schoolTelephone"
+        inputRef={register({ required: true, maxLength: 6 })}
+        error={Boolean(errors.schoolTelephone)}
+        helperText={
+          Boolean(errors.schoolTelephone)
+            ? "El teléfono debe contener hasta 6 dígitos"
+            : null
+        }
+        defaultValue={data.schoolTelephone}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Celular"
+        name="schoolCellphone"
+        inputRef={register({ required: true, maxLength: 9 })}
+        error={Boolean(errors.schoolCellphone)}
+        helperText={
+          Boolean(errors.schoolCellphone)
+            ? "El celular debe contener hasta 9 dígitos"
+            : null
+        }
+        defaultValue={data.schoolCellphone}
+        fullWidth
+      />
 
       {/*-- Responsable --*/}
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h2">Responsable</Typography>
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Nombre"
-            placeholder=""
-            fullWidth
-            value={responsableName}
-            onChange={(e) => setResponsableName(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Cargo"
-            placeholder=""
-            fullWidth
-            value={responsablePosition}
-            onChange={(e) => setResponsablePosition(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            variant="outlined"
-            label="Correo Electrónico"
-            placeholder=""
-            fullWidth
-            value={responsableEmail}
-            onChange={(e) => setResponsableEmail(e.target.value)}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h2">Responsable</Typography>
+      <TextField
+        variant="outlined"
+        label="Nombre"
+        name="responsableName"
+        inputRef={register}
+        defaultValue={data.responsableName}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Cargo"
+        name="responsablePosition"
+        inputRef={register}
+        defaultValue={data.responsablePosition}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Correo Electrónico"
+        name="responsableEmail"
+        inputRef={register}
+        defaultValue={data.responsableEmail}
+        fullWidth
+      />
 
       {/*-- Inicial --*/}
-      <Grid
-        container
-        direction="column"
-        spacing={1}
-        style={{ marginTop: "1rem" }}
-      >
-        <Grid item>
-          <Typography variant="h2">Inicial</Typography>
-        </Grid>
-        <Grid container item>
-          <MaterialTable
-            style={{
-              width: "100%",
-            }}
-            columns={[
-              { title: "Titulo", field: "name" },
-              { title: "Editorial", field: "editorial" },
-              { title: "2 años", field: "count2", type: "numeric" },
-              { title: "3 años", field: "count3", type: "numeric" },
-              { title: "4 años", field: "count4", type: "numeric" },
-              { title: "5 años", field: "count5", type: "numeric" },
-            ]}
-            data={inicialOrders}
-            editable={{
-              onRowUpdate: async (newData, oldData) => {
-                const dataUpdate = [...inicialOrders]
-                const index = oldData.tableData.id
-                dataUpdate[index] = newData
-                setInicialOrders([...dataUpdate])
-              },
-            }}
-            options={{
-              toolbar: false,
-              paging: false,
-            }}
-            icons={tableIcons}
-            localization={tableLocalization}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h2" style={{ marginTop: "1rem" }}>
+        Inicial
+      </Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Editorial", field: "editorial" },
+          { title: "2 años", field: "count2", type: "numeric" },
+          { title: "3 años", field: "count3", type: "numeric" },
+          { title: "4 años", field: "count4", type: "numeric" },
+          { title: "5 años", field: "count5", type: "numeric" },
+        ]}
+        data={inicialOrders}
+        editable={{
+          onRowUpdate: async (newData, oldData) => {
+            const dataUpdate = [...inicialOrders]
+            const index = oldData.tableData.id
+            dataUpdate[index] = newData
+            setInicialOrders([...dataUpdate])
+          },
+        }}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+        localization={tableLocalization}
+      />
 
       {/*-- Primaria --*/}
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h2">Primaria</Typography>
-        </Grid>
-        <Grid container item>
-          <MaterialTable
-            style={{
-              width: "100%",
-            }}
-            columns={[
-              { title: "Titulo", field: "name" },
-              { title: "Editorial", field: "editorial" },
-              { title: "1ero", field: "count1", type: "numeric" },
-              { title: "2do", field: "count2", type: "numeric" },
-              { title: "3ero", field: "count3", type: "numeric" },
-              { title: "4to", field: "count4", type: "numeric" },
-              { title: "5to", field: "count5", type: "numeric" },
-              { title: "6to", field: "count6", type: "numeric" },
-            ]}
-            data={primariaOrders}
-            editable={{
-              onRowUpdate: async (newData, oldData) => {
-                const dataUpdate = [...primariaOrders]
-                const index = oldData.tableData.id
-                dataUpdate[index] = newData
-                setPrimariaOrders([...dataUpdate])
-              },
-            }}
-            options={{
-              toolbar: false,
-              paging: false,
-            }}
-            icons={tableIcons}
-            localization={tableLocalization}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h2">Primaria</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Editorial", field: "editorial" },
+          { title: "1ero", field: "count1", type: "numeric" },
+          { title: "2do", field: "count2", type: "numeric" },
+          { title: "3ero", field: "count3", type: "numeric" },
+          { title: "4to", field: "count4", type: "numeric" },
+          { title: "5to", field: "count5", type: "numeric" },
+          { title: "6to", field: "count6", type: "numeric" },
+        ]}
+        data={primariaOrders}
+        editable={{
+          onRowUpdate: async (newData, oldData) => {
+            const dataUpdate = [...primariaOrders]
+            const index = oldData.tableData.id
+            dataUpdate[index] = newData
+            setPrimariaOrders([...dataUpdate])
+          },
+        }}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+        localization={tableLocalization}
+      />
 
       {/*-- Secundaria --*/}
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h2">Secundaria</Typography>
-        </Grid>
-        <Grid container item>
-          <MaterialTable
-            style={{
-              width: "100%",
-            }}
-            columns={[
-              { title: "Titulo", field: "name" },
-              { title: "Editorial", field: "editorial" },
-              { title: "1ero", field: "count1", type: "numeric" },
-              { title: "2do", field: "count2", type: "numeric" },
-              { title: "3ero", field: "count3", type: "numeric" },
-              { title: "4to", field: "count4", type: "numeric" },
-              { title: "5to", field: "count5", type: "numeric" },
-            ]}
-            data={secundariaOrders}
-            editable={{
-              onRowUpdate: async (newData, oldData) => {
-                const dataUpdate = [...secundariaOrders]
-                const index = oldData.tableData.id
-                dataUpdate[index] = newData
-                setSecundariaOrders([...dataUpdate])
-              },
-            }}
-            options={{
-              toolbar: false,
-              paging: false,
-            }}
-            icons={tableIcons}
-            localization={tableLocalization}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h2">Secundaria</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Editorial", field: "editorial" },
+          { title: "1ero", field: "count1", type: "numeric" },
+          { title: "2do", field: "count2", type: "numeric" },
+          { title: "3ero", field: "count3", type: "numeric" },
+          { title: "4to", field: "count4", type: "numeric" },
+          { title: "5to", field: "count5", type: "numeric" },
+        ]}
+        data={secundariaOrders}
+        editable={{
+          onRowUpdate: async (newData, oldData) => {
+            const dataUpdate = [...secundariaOrders]
+            const index = oldData.tableData.id
+            dataUpdate[index] = newData
+            setSecundariaOrders([...dataUpdate])
+          },
+        }}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+        localization={tableLocalization}
+      />
 
       {/*-- Otros --*/}
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h2">Otros</Typography>
-        </Grid>
-        <Grid container item>
-          <MaterialTable
-            style={{
-              width: "100%",
-            }}
-            columns={[
-              { title: "Titulo", field: "name" },
-              { title: "Cantidad", field: "count", type: "numeric" },
-            ]}
-            data={otrosOrders}
-            editable={{
-              onRowUpdate: async (newData, oldData) => {
-                const dataUpdate = [...otrosOrders]
-                const index = oldData.tableData.id
-                dataUpdate[index] = newData
-                setOtrosOrders([...dataUpdate])
-              },
-            }}
-            options={{
-              toolbar: false,
-              paging: false,
-            }}
-            icons={tableIcons}
-            localization={tableLocalization}
-          />
-        </Grid>
-      </Grid>
+      <Typography variant="h2">Otros</Typography>
+      <MaterialTable
+        style={{
+          width: "100%",
+        }}
+        columns={[
+          { title: "Titulo", field: "name" },
+          { title: "Cantidad", field: "count", type: "numeric" },
+        ]}
+        data={otrosOrders}
+        editable={{
+          onRowUpdate: async (newData, oldData) => {
+            const dataUpdate = [...otrosOrders]
+            const index = oldData.tableData.id
+            dataUpdate[index] = newData
+            setOtrosOrders([...dataUpdate])
+          },
+        }}
+        options={{
+          toolbar: false,
+          paging: false,
+        }}
+        icons={tableIcons}
+        localization={tableLocalization}
+      />
 
       {/*-- Operations --*/}
-      <Grid container direction="column" style={{ marginTop: "2rem" }}>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleClick}
-          >
-            Guardar
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
+      <Button
+        variant="contained"
+        color="primary"
+        type="submit"
+        fullWidth
+        style={{ marginTop: "2rem" }}
+      >
+        Guardar
+      </Button>
+    </form>
   )
 }
 

@@ -256,14 +256,6 @@ const downloadFile = async (data) => {
 }
 
 const toDocumentData = (data) => {
-  if (
-    data.schoolTelephone.length > 9 ||
-    data.schoolRUC.length > 11 ||
-    data.schoolTelephone.length > 9
-  ) {
-    return null
-  }
-
   return {
     number: data.orderNumber,
     dateDay: data.orderDate.getDay(),
