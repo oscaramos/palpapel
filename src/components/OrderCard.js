@@ -44,11 +44,6 @@ function OrderCard({ id, orderNumber, orderDate, responsableName }) {
             <Grid item>
               <div style={{ fontSize: "1.2rem" }}>{responsableName}</div>
             </Grid>
-            <Grid item>
-              <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                Total Items
-              </div>
-            </Grid>
           </Grid>
         </CardContent>
       </Card>

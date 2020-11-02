@@ -31,13 +31,13 @@ function MyOrders({ orders, loading, error }) {
 
   useEffect(() => {
     if (error) {
-      throwError("Error loading my orders")
+      throwError("Error cargando mis ordenes")
     }
   }, [error, throwError])
 
   return (
     <Grid item>
-      <Typography variant="h2">My orders</Typography>
+      <Typography variant="h2">Mis Ordenes</Typography>
 
       <Grid
         container
@@ -66,7 +66,7 @@ function MyOrders({ orders, loading, error }) {
 function SharedWithMe() {
   return (
     <Grid item style={{ marginTop: "1rem", marginBottom: "2rem" }}>
-      <Typography variant="h2">Shared With Me</Typography>
+      {/*<Typography variant="h2">Shared With Me</Typography>*/}
 
       {/*<Grid*/}
       {/*  container*/}
@@ -91,7 +91,7 @@ function Operations() {
   }
 
   return (
-    <Grid container direction="column" style={{ marginTop: "1rem" }}>
+    <Grid container direction="column">
       <MyOrders orders={orders} loading={loading} error={error} />
 
       <SharedWithMe />
@@ -103,7 +103,7 @@ function Operations() {
           fullWidth
           onClick={handleCreateOrder}
         >
-          Create New Order
+          Crear Nueva Orden
         </Button>
       </Grid>
     </Grid>
@@ -135,7 +135,7 @@ function Home() {
   }, [user, loading, setLocation])
 
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth="sm">
       <AppBar
         position="sticky"
         variant="outlined"
@@ -147,7 +147,7 @@ function Home() {
               <Link href="/search">
                 <TextField
                   variant="outlined"
-                  placeholder="Search"
+                  placeholder="Buscar"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment>
@@ -182,7 +182,7 @@ function Home() {
             handleCloseMenu()
           }}
         >
-          Logout
+          Cerrar sesión
         </MenuItem>
       </Menu>
 

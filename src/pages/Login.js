@@ -58,30 +58,30 @@ function Login() {
   return (
     <Container maxWidth="xs">
       <Typography variant="h1" align="center" style={{ marginTop: "4rem" }}>
-        Login
+        Iniciar Sesión
       </Typography>
       <form onSubmit={handleSubmit(loginUser)}>
         <TextField
           variant="outlined"
           margin="normal"
-          fullWidth
-          label="Email Address"
-          autoFocus
+          label="Correo Electrónico"
           name="email"
           inputRef={register}
           error={Boolean(errors.email)}
           helperText={errors?.email?.message}
+          fullWidth
+          autoFocus
         />
         <TextField
           variant="outlined"
           margin="normal"
-          fullWidth
-          label="Password"
+          label="Contraseña"
           type="password"
           name="password"
           inputRef={register}
           error={Boolean(errors.password)}
           helperText={errors?.password?.message}
+          fullWidth
         />
 
         <Button
@@ -91,13 +91,13 @@ function Login() {
           color="primary"
           style={{ marginTop: "1rem", marginBottom: "0.5rem" }}
         >
-          Log In
+          Iniciar Sesión
         </Button>
       </form>
       <Grid container direction="row" justify="center">
         <Grid item>
           <Link href="/register">
-            <MuiLink>Register</MuiLink>
+            <MuiLink>Registrarse</MuiLink>
           </Link>
         </Grid>
       </Grid>

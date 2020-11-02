@@ -48,13 +48,13 @@ function Register() {
   return (
     <Container maxWidth="xs">
       <Typography variant="h1" align="center" style={{ marginTop: "4rem" }}>
-        Register
+        Registrarse
       </Typography>
       <form onSubmit={handleSubmit(registerUser)}>
         <TextField
           variant="outlined"
           margin="normal"
-          label="Email Address"
+          label="Correo Electrónico"
           name="email"
           inputRef={register}
           autoComplete="email"
@@ -65,7 +65,7 @@ function Register() {
         <TextField
           variant="outlined"
           margin="normal"
-          label="Password"
+          label="Contraseña"
           type="password"
           name="password"
           inputRef={register}
@@ -77,7 +77,7 @@ function Register() {
         <TextField
           variant="outlined"
           margin="normal"
-          label="Confirm Password"
+          label="Confirmar Contraseña"
           name="confirmPassword"
           inputRef={register}
           type="password"
@@ -92,13 +92,13 @@ function Register() {
           style={{ marginTop: "1rem", marginBottom: "0.5rem" }}
           fullWidth
         >
-          Register
+          Registrarse
         </Button>
       </form>
       <Grid container direction="row" justify="center">
         <Grid item>
           <Link href="/login">
-            <MuiLink>Log In</MuiLink>
+            <MuiLink>Iniciar Sesión</MuiLink>
           </Link>
         </Grid>
       </Grid>

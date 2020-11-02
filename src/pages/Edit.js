@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "wouter"
 import MaterialTable from "material-table"
+import esLocale from "date-fns/locale/es"
 
 import {
   Grid,
@@ -21,6 +22,7 @@ import DateFnsUtils from "@date-io/date-fns"
 import { useOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
+import tableLocalization from "../utils/tableLocalization"
 
 function EditForm({ data, onSubmit }) {
   const [orderNumber, setOrderNumber] = useState(data.orderNumber)
@@ -67,36 +69,26 @@ function EditForm({ data, onSubmit }) {
   }
 
   return (
-    <Grid
-      container
-      direction="column"
-      style={{ marginTop: "1rem", marginBottom: "1rem" }}
-    >
+    <Grid container direction="column">
       {/*-- Order --*/}
-      <Grid
-        item
-        container
-        direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
-        spacing={1}
-      >
+      <Grid item container direction="column" spacing={1}>
         <Grid item>
-          <Typography variant="h2">Order</Typography>
+          <Typography variant="h2">Orden</Typography>
         </Grid>
         <Grid item>
           <TextField
             variant="outlined"
-            label="Order Number"
-            placeholder="000104"
+            label="Número"
+            placeholder="000001"
             fullWidth
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
           />
         </Grid>
         <Grid item>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
             <DatePicker
-              label="Order Date"
+              label="Fecha"
               value={orderDate}
               onChange={handleOrderDateChange}
               inputVariant="outlined"
@@ -107,20 +99,15 @@ function EditForm({ data, onSubmit }) {
       </Grid>
 
       {/*-- School --*/}
-      <Grid
-        container
-        direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
-        spacing={1}
-      >
+      <Grid container direction="column" spacing={1}>
         <Grid item>
-          <Typography variant="h2">School</Typography>
+          <Typography variant="h2">Colegio</Typography>
         </Grid>
         <Grid item>
           <TextField
             variant="outlined"
-            label="Name"
-            placeholder="Colegio de las rosas"
+            label="Nombre"
+            placeholder=""
             fullWidth
             value={schoolName}
             onChange={(e) => setSchoolName(e.target.value)}
@@ -129,8 +116,8 @@ function EditForm({ data, onSubmit }) {
         <Grid item>
           <TextField
             variant="outlined"
-            label="Address"
-            placeholder="2972 Westheimer Rd. Santa Ana, Illinois 85486"
+            label="Dirección"
+            placeholder=""
             fullWidth
             value={schoolAddress}
             onChange={(e) => setSchoolAddress(e.target.value)}
@@ -140,7 +127,7 @@ function EditForm({ data, onSubmit }) {
           <TextField
             variant="outlined"
             label="RUC"
-            placeholder="20601888221"
+            placeholder=""
             fullWidth
             value={schoolRUC}
             onChange={(e) => setSchoolRUC(e.target.value)}
@@ -149,8 +136,8 @@ function EditForm({ data, onSubmit }) {
         <Grid item>
           <TextField
             variant="outlined"
-            label="Telephone Number"
-            placeholder="(704) 555-0127"
+            label="Teléfono"
+            placeholder=""
             fullWidth
             value={schoolTelephone}
             onChange={(e) => setSchoolTelephone(e.target.value)}
@@ -159,7 +146,7 @@ function EditForm({ data, onSubmit }) {
         <Grid item>
           <TextField
             variant="outlined"
-            label="Cellphone Number"
+            label="Celular"
             placeholder="(704) 555-0120"
             fullWidth
             value={schoolCellphone}
@@ -169,20 +156,15 @@ function EditForm({ data, onSubmit }) {
       </Grid>
 
       {/*-- Responsable --*/}
-      <Grid
-        container
-        direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
-        spacing={1}
-      >
+      <Grid container direction="column" spacing={1}>
         <Grid item>
           <Typography variant="h2">Responsable</Typography>
         </Grid>
         <Grid item>
           <TextField
             variant="outlined"
-            label="Name"
-            placeholder="Bessie Cooper"
+            label="Nombre"
+            placeholder=""
             fullWidth
             value={responsableName}
             onChange={(e) => setResponsableName(e.target.value)}
@@ -191,8 +173,8 @@ function EditForm({ data, onSubmit }) {
         <Grid item>
           <TextField
             variant="outlined"
-            label="Position"
-            placeholder="Teacher"
+            label="Cargo"
+            placeholder=""
             fullWidth
             value={responsablePosition}
             onChange={(e) => setResponsablePosition(e.target.value)}
@@ -201,8 +183,8 @@ function EditForm({ data, onSubmit }) {
         <Grid item>
           <TextField
             variant="outlined"
-            label="Email"
-            placeholder="betsie@example.com"
+            label="Correo Electrónico"
+            placeholder=""
             fullWidth
             value={responsableEmail}
             onChange={(e) => setResponsableEmail(e.target.value)}
@@ -214,8 +196,8 @@ function EditForm({ data, onSubmit }) {
       <Grid
         container
         direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
         spacing={1}
+        style={{ marginTop: "1rem" }}
       >
         <Grid item>
           <Typography variant="h2">Inicial</Typography>
@@ -247,17 +229,13 @@ function EditForm({ data, onSubmit }) {
               paging: false,
             }}
             icons={tableIcons}
+            localization={tableLocalization}
           />
         </Grid>
       </Grid>
 
       {/*-- Primaria --*/}
-      <Grid
-        container
-        direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
-        spacing={1}
-      >
+      <Grid container direction="column" spacing={1}>
         <Grid item>
           <Typography variant="h2">Primaria</Typography>
         </Grid>
@@ -290,17 +268,13 @@ function EditForm({ data, onSubmit }) {
               paging: false,
             }}
             icons={tableIcons}
+            localization={tableLocalization}
           />
         </Grid>
       </Grid>
 
       {/*-- Secundaria --*/}
-      <Grid
-        container
-        direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
-        spacing={1}
-      >
+      <Grid container direction="column" spacing={1}>
         <Grid item>
           <Typography variant="h2">Secundaria</Typography>
         </Grid>
@@ -332,17 +306,13 @@ function EditForm({ data, onSubmit }) {
               paging: false,
             }}
             icons={tableIcons}
+            localization={tableLocalization}
           />
         </Grid>
       </Grid>
 
       {/*-- Otros --*/}
-      <Grid
-        container
-        direction="column"
-        style={{ marginTop: "1rem", marginBottom: "1rem" }}
-        spacing={1}
-      >
+      <Grid container direction="column" spacing={1}>
         <Grid item>
           <Typography variant="h2">Otros</Typography>
         </Grid>
@@ -369,12 +339,13 @@ function EditForm({ data, onSubmit }) {
               paging: false,
             }}
             icons={tableIcons}
+            localization={tableLocalization}
           />
         </Grid>
       </Grid>
 
       {/*-- Operations --*/}
-      <Grid container direction="column">
+      <Grid container direction="column" style={{ marginTop: "2rem" }}>
         <Grid item>
           <Button
             variant="contained"
@@ -382,7 +353,7 @@ function EditForm({ data, onSubmit }) {
             fullWidth
             onClick={handleClick}
           >
-            Save
+            Guardar
           </Button>
         </Grid>
       </Grid>
@@ -440,7 +411,7 @@ function Edit({ params }) {
   }
 
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth="sm">
       <AppBar
         position="sticky"
         variant="outlined"
@@ -461,7 +432,7 @@ function Edit({ params }) {
           <Grid container direction="row" justify="center">
             <Grid item>
               <Typography variant="h5" align="center">
-                Create Order
+                Crear Orden
               </Typography>
             </Grid>
           </Grid>

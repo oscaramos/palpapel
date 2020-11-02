@@ -46,7 +46,7 @@ function Search() {
             <Grid item style={{ flexGrow: 1 }}>
               <TextField
                 variant="outlined"
-                placeholder="Search"
+                placeholder="Buscar"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment>
@@ -65,7 +65,7 @@ function Search() {
 
       <Grid container direction="column" style={{ marginTop: "1rem" }}>
         <Grid item>
-          <Typography variant="h2">Results</Typography>
+          <Typography variant="h2">Resultados</Typography>
 
           <Grid
             container

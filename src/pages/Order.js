@@ -22,6 +22,7 @@ import ShareIcon from "@material-ui/icons/Share"
 import { useOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
+import tableLocalization from "../utils/tableLocalization"
 
 function OrderToolBar({ data, loading, onClickDownload }) {
   return (
@@ -109,27 +110,23 @@ function OrderDetails({ data, loading }) {
   }
 
   return (
-    <Grid
-      container
-      direction="column"
-      style={{ marginTop: "1rem", marginBottom: "1rem" }}
-    >
-      <Typography variant="h2">School</Typography>
-      <div style={label}>Name</div>
+    <Grid container direction="column">
+      <Typography variant="h2">Colegio</Typography>
+      <div style={label}>Nombre</div>
       <Typography variant="body1">{data.schoolName}</Typography>
-      <div style={label}>Address</div>
+      <div style={label}>Dirección</div>
       <Typography variant="body1">{data.schoolAddress}</Typography>
       <div style={label}>RUC</div>
       <Typography variant="body1">{data.schoolRUC}</Typography>
-      <div style={label}>Telephone Number</div>
+      <div style={label}>Teléfono</div>
       <Typography variant="body1">{data.schoolTelephone}</Typography>
 
       <Typography variant="h2">Responsable</Typography>
-      <div style={label}>Name</div>
+      <div style={label}>Nombre</div>
       <Typography variant="body1">{data.responsableName}</Typography>
-      <div style={label}>Position</div>
+      <div style={label}>Cargo</div>
       <Typography variant="body1">{data.responsablePosition}</Typography>
-      <div style={label}>Email</div>
+      <div style={label}>Correo Electrónico</div>
       <Typography variant="body1">{data.responsableEmail}</Typography>
 
       <Typography variant="h2">Inicial</Typography>
@@ -151,6 +148,7 @@ function OrderDetails({ data, loading }) {
           paging: false,
         }}
         icons={tableIcons}
+        localization={tableLocalization}
       />
 
       <Typography variant="h2">Primaria</Typography>
@@ -174,6 +172,7 @@ function OrderDetails({ data, loading }) {
           paging: false,
         }}
         icons={tableIcons}
+        localization={tableLocalization}
       />
 
       <Typography variant="h2">Secundaria</Typography>
@@ -196,6 +195,7 @@ function OrderDetails({ data, loading }) {
           paging: false,
         }}
         icons={tableIcons}
+        localization={tableLocalization}
       />
 
       <Typography variant="h2">Otros</Typography>
@@ -213,6 +213,7 @@ function OrderDetails({ data, loading }) {
           paging: false,
         }}
         icons={tableIcons}
+        localization={tableLocalization}
       />
     </Grid>
   )
@@ -355,7 +356,7 @@ function Order({ params }) {
   }
 
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth="sm">
       <OrderToolBar
         data={data}
         loading={loading}
@@ -364,11 +365,11 @@ function Order({ params }) {
 
       <OrderDetails data={data} loading={loading} />
 
-      <Grid container direction="column">
+      <Grid container direction="column" style={{ marginTop: "2rem" }}>
         <Grid item>
           <Link href={`/edit/${id}`}>
             <Button variant="contained" color="primary" fullWidth>
-              Modify
+              Modificar
             </Button>
           </Link>
         </Grid>
@@ -379,7 +380,7 @@ function Order({ params }) {
             fullWidth
             onClick={handleDelete}
           >
-            Delete
+            Eliminar
           </Button>
         </Grid>
       </Grid>
