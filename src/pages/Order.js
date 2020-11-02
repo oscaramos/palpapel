@@ -298,11 +298,38 @@ const toDocumentData = (data) => {
     responsablePosition: data.responsablePosition,
     responsableEmail: data.responsableEmail,
 
-    InicialOrders: data.inicialOrders,
-    PrimariaOrders: data.primariaOrders,
-    SecundariaOrders: data.secundariaOrders,
-    OtrosOrders1: data.otrosOrders.slice(0, 9),
-    OtrosOrders2: data.otrosOrders.slice(9, 18),
+    InicialOrders: data.inicialOrders.map((order) => ({
+      ...order,
+      count2: order.count2 || "",
+      count3: order.count3 || "",
+      count4: order.count4 || "",
+      count5: order.count5 || "",
+    })),
+    PrimariaOrders: data.primariaOrders.map((order) => ({
+      ...order,
+      count1: order.count1 || "",
+      count2: order.count2 || "",
+      count3: order.count3 || "",
+      count4: order.count4 || "",
+      count5: order.count5 || "",
+      count6: order.count6 || "",
+    })),
+    SecundariaOrders: data.secundariaOrders.map((order) => ({
+      ...order,
+      count1: order.count1 || "",
+      count2: order.count2 || "",
+      count3: order.count3 || "",
+      count4: order.count4 || "",
+      count5: order.count5 || "",
+    })),
+    OtrosOrders1: data.otrosOrders.slice(0, 9).map((order) => ({
+      ...order,
+      count: order.count || "",
+    })),
+    OtrosOrders2: data.otrosOrders.slice(9, 18).map((order) => ({
+      ...order,
+      count: order.count || "",
+    })),
   }
 }
 
