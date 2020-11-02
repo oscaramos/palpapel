@@ -23,22 +23,12 @@ function OrderCard({ id, orderNumber, orderDate, responsableName }) {
       <Card className={classes.cardContainer}>
         <CardContent style={{ padding: 12 }}>
           <Grid container direction="column">
-            <Grid
-              item
-              container
-              direction="row"
-              justify="space-between"
-              alignItems="center"
-            >
+            <Grid item container direction="row" justify="space-between" alignItems="center">
               <Grid item>
-                <div style={{ fontSize: "1.4rem", fontWeight: "bold" }}>
-                  Nº {orderNumber}
-                </div>
+                <div style={{ fontSize: "1.4rem", fontWeight: "bold" }}>Nº {orderNumber}</div>
               </Grid>
               <Grid item>
-                <div style={{ fontSize: "0.9rem", fontWeight: "normal" }}>
-                  {orderDate}
-                </div>
+                <div style={{ fontSize: "0.9rem", fontWeight: "normal" }}>{orderDate}</div>
               </Grid>
             </Grid>
             <Grid item>

@@ -3,14 +3,7 @@ import { Link, useLocation } from "wouter"
 import { useForm } from "react-hook-form"
 import { useAuthState } from "react-firebase-hooks/auth"
 
-import {
-  Container,
-  TextField,
-  Button,
-  Link as MuiLink,
-  Grid,
-  Typography,
-} from "@material-ui/core"
+import { Container, TextField, Button, Link as MuiLink, Grid, Typography } from "@material-ui/core"
 
 import { auth } from "../firebase.utils"
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -18,10 +11,7 @@ import * as yup from "yup"
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup
-    .string()
-    .required()
-    .min(8, "password should be at least 8 characters"),
+  password: yup.string().required().min(8, "password should be at least 8 characters"),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords does not match")

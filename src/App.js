@@ -37,11 +37,7 @@ function ErrorPopup() {
   }
 
   return (
-    <Snackbar
-      open={errorSnack.open}
-      autoHideDuration={6000}
-      onClose={handleCloseSnack}
-    >
+    <Snackbar open={errorSnack.open} autoHideDuration={6000} onClose={handleCloseSnack}>
       <Alert elevation={6} variant="filled" severity="error">
         {errorSnack.message}
       </Alert>

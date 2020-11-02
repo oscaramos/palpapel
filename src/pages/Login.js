@@ -5,23 +5,13 @@ import { useForm } from "react-hook-form"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { yupResolver } from "@hookform/resolvers/yup"
 
-import {
-  Container,
-  TextField,
-  Button,
-  Link as MuiLink,
-  Grid,
-  Typography,
-} from "@material-ui/core"
+import { Container, TextField, Button, Link as MuiLink, Grid, Typography } from "@material-ui/core"
 import { auth } from "../firebase.utils"
 import { useError } from "../hooks/useError"
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup
-    .string()
-    .required()
-    .min(8, "password should be at least 8 characters"),
+  password: yup.string().required().min(8, "password should be at least 8 characters"),
 })
 
 function Login() {
@@ -33,20 +23,15 @@ function Login() {
   const { throwError } = useError()
 
   const loginUser = (data) => {
-    auth
-      .signInWithEmailAndPassword(data.email, data.password)
-      .catch((error) => {
-        if (
-          error.code === "auth/user-not-found" ||
-          error.code === "auth/wrong-password"
-        ) {
-          throwError("The email address or password are wrong")
-        } else if (error.code === "auth/too-many-requests") {
-          throwError("Too many attempts")
-        } else {
-          throwError("Unknown error")
-        }
-      })
+    auth.signInWithEmailAndPassword(data.email, data.password).catch((error) => {
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        throwError("The email address or password are wrong")
+      } else if (error.code === "auth/too-many-requests") {
+        throwError("Too many attempts")
+      } else {
+        throwError("Unknown error")
+      }
+    })
   }
 
   useEffect(() => {

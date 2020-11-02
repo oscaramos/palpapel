@@ -9,11 +9,7 @@ export function ErrorProvider({ children }) {
     setMessage(message)
   }
 
-  return (
-    <ErrorContext.Provider value={{ message, throwError }}>
-      {children}
-    </ErrorContext.Provider>
-  )
+  return <ErrorContext.Provider value={{ message, throwError }}>{children}</ErrorContext.Provider>
 }
 
 export function useError() {

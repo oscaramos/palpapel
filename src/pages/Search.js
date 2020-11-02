@@ -30,9 +30,7 @@ function Search() {
     }
   }, [error, throwError])
 
-  const orders = allOrders?.filter((order) =>
-    order.orderNumber.startsWith(search)
-  )
+  const orders = allOrders?.filter((order) => order.orderNumber.startsWith(search))
 
   return (
     <Container maxWidth="xs">
@@ -83,14 +81,7 @@ function Search() {
                 />
               </Grid>
             ))}
-            {loading && (
-              <Skeleton
-                variant="rect"
-                width="100%"
-                height={118}
-                animation="wave"
-              />
-            )}
+            {loading && <Skeleton variant="rect" width="100%" height={118} animation="wave" />}
           </Grid>
         </Grid>
       </Grid>

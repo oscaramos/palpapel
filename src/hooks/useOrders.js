@@ -3,10 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import { format } from "date-fns"
 
 import { auth, firestore } from "../firebase.utils"
-import {
-  useCollectionData,
-  useDocumentData,
-} from "react-firebase-hooks/firestore"
+import { useCollectionData, useDocumentData } from "react-firebase-hooks/firestore"
 
 /*-- Firebase utils functions --*/
 const createOrder = async () => {

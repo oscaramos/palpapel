@@ -55,9 +55,7 @@ function MyOrders({ orders, loading, error }) {
             />
           </Grid>
         ))}
-        {loading && (
-          <Skeleton variant="rect" width="100%" height={118} animation="wave" />
-        )}
+        {loading && <Skeleton variant="rect" width="100%" height={118} animation="wave" />}
       </Grid>
     </Grid>
   )
@@ -97,12 +95,7 @@ function Operations() {
       <SharedWithMe />
 
       <Grid item>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleCreateOrder}
-        >
+        <Button variant="contained" color="primary" fullWidth onClick={handleCreateOrder}>
           Crear Nueva Orden
         </Button>
       </Grid>
@@ -151,9 +144,7 @@ function Home() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment>
-                        <SearchIcon
-                          style={{ opacity: "0.4", marginRight: 10 }}
-                        />
+                        <SearchIcon style={{ opacity: "0.4", marginRight: 10 }} />
                       </InputAdornment>
                     ),
                   }}
