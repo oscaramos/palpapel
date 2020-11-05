@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { format } from "date-fns"
 
@@ -6,7 +6,7 @@ import { auth, firestore } from "../firebase.utils"
 import { useCollectionData, useDocumentData } from "react-firebase-hooks/firestore"
 
 /*-- Firebase utils functions --*/
-const createOrder = async () => {
+export const createOrder = async () => {
   return await firestore.collection("orders").add({
     orderDate: new Date(),
     orderNumber: "000000",
@@ -278,24 +278,15 @@ const createOrder = async () => {
   })
 }
 
-const getOrder = async (id) => {
-  const docRef = firestore.collection("orders").doc(id)
-  const doc = await docRef.get()
-  return doc.data()
-}
-
-const editOrder = async (id, data) => {
+export const editOrder = async (id, data) => {
   const docRef = firestore.collection("orders").doc(id)
   await docRef.update(data)
 }
 
-const deleteOrder = async (id) => {
+export const deleteOrder = async (id) => {
   const docRef = firestore.collection("orders").doc(id)
   await docRef.delete()
 }
-
-/*-- useOrders hook --*/
-const OrdersContext = createContext(undefined)
 
 const fromFirestoreDocument = (order) => ({
   ...order,
@@ -303,7 +294,7 @@ const fromFirestoreDocument = (order) => ({
   orderDisplayDate: format(order.orderDate.toDate(), "dd/MM/yyyy"),
 })
 
-function useGetAllOrders() {
+export function useGetAllOrders() {
   const [user] = useAuthState(auth)
 
   const [rawOrders, loading, error] = useCollectionData(
@@ -321,7 +312,7 @@ function useGetAllOrders() {
   return [orders, loading, error]
 }
 
-function useGetOrder() {
+export function useGetOrder() {
   const [orderId, setOrderId] = useState("")
   const [rawOrder, loading, error] = useDocumentData(
     firestore.collection("orders").doc(orderId || " "),
@@ -332,37 +323,12 @@ function useGetOrder() {
 
   const order = rawOrder ? fromFirestoreDocument(rawOrder) : null
 
-  const getOrderWrapper = useCallback(
-    async (id) => {
+  const getOrder = useCallback(
+    (id) => {
       setOrderId(id)
-      return await getOrder(id)
     },
     [setOrderId]
   )
 
-  return [getOrderWrapper, order, loading, error]
-}
-
-export function OrdersProvider({ children }) {
-  return (
-    <OrdersContext.Provider
-      value={{
-        getAllOrders: useGetAllOrders(),
-        getOrder: useGetOrder(),
-        createOrder,
-        editOrder,
-        deleteOrder,
-      }}
-    >
-      {children}
-    </OrdersContext.Provider>
-  )
-}
-
-export function useOrders() {
-  const context = useContext(OrdersContext)
-  if (context === undefined) {
-    throw new Error("useOrders must be within a OrdersProvider")
-  }
-  return context
+  return [getOrder, order, loading, error]
 }

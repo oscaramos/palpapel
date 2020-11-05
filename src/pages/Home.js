@@ -21,7 +21,7 @@ import SearchIcon from "@material-ui/icons/Search"
 import MenuIcon from "@material-ui/icons/Menu"
 
 import OrderCard from "../components/OrderCard"
-import { useOrders } from "../hooks/useOrders"
+import { createOrder, useGetAllOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
 
 import { auth } from "../firebase.utils"
@@ -78,10 +78,7 @@ function SharedWithMe() {
 
 function Operations() {
   const [, setLocation] = useLocation()
-  const {
-    getAllOrders: [orders, loading, error],
-    createOrder,
-  } = useOrders()
+  const [orders, loading, error] = useGetAllOrders()
 
   const handleCreateOrder = async () => {
     const res = await createOrder()

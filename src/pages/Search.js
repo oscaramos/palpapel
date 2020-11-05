@@ -13,13 +13,11 @@ import SearchIcon from "@material-ui/icons/Search"
 
 import OrderCard from "../components/OrderCard"
 import Skeleton from "@material-ui/lab/Skeleton"
-import { useOrders } from "../hooks/useOrders"
+import { useGetAllOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
 
 function Search() {
-  const {
-    getAllOrders: [allOrders, loading, error],
-  } = useOrders()
+  const [allOrders, loading, error] = useGetAllOrders()
   const { throwError } = useError()
 
   const [search, setSearch] = useState("")

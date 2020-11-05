@@ -20,7 +20,7 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 
 import DateFnsUtils from "@date-io/date-fns"
 
-import { useOrders } from "../hooks/useOrders"
+import { editOrder, useGetOrder } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
@@ -317,21 +317,20 @@ function Edit({ params }) {
   const [, setLocation] = useLocation()
   const { throwError } = useError()
 
-  const {
-    getOrder: [getOrder, data, loading, error],
-    editOrder,
-  } = useOrders()
+  const [getOrder, data, loading, error] = useGetOrder()
 
   useEffect(() => {
-    const requestOrder = async () => {
-      const data = await getOrder(id)
-      if (!data) {
-        throwError("Order does not exists")
-        setLocation("/")
-      }
+    if (id) {
+      getOrder(id)
     }
-    requestOrder()
-  }, [getOrder, id, setLocation, throwError])
+  }, [getOrder, id])
+
+  useEffect(() => {
+    if (!data && !loading) {
+      throwError("Order does not exists")
+      setLocation("/")
+    }
+  }, [throwError, setLocation])
 
   useEffect(() => {
     if (error) {
