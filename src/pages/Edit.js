@@ -44,6 +44,15 @@ function EditForm({ data, onSubmit }) {
   const [otrosOrders, setOtrosOrders] = useState(data.otrosOrders)
 
   const onSubmitInternal = (data) => {
+    const convertCountsToNumbers = (orders) =>
+      orders.map((order) =>
+        Object.fromEntries(
+          Object.entries(order).map(([key, val]) =>
+            key.startsWith("count") ? [key, Number(val)] : [key, val]
+          )
+        )
+      )
+
     onSubmit({
       orderNumber: data.orderNumber,
       orderDate,
@@ -58,10 +67,10 @@ function EditForm({ data, onSubmit }) {
       responsableName: data.responsableName,
       responsablePosition: data.responsablePosition,
       responsableEmail: data.responsableEmail,
-      inicialOrders,
-      primariaOrders,
-      secundariaOrders,
-      otrosOrders,
+      inicialOrders: convertCountsToNumbers(inicialOrders),
+      primariaOrders: convertCountsToNumbers(primariaOrders),
+      secundariaOrders: convertCountsToNumbers(secundariaOrders),
+      otrosOrders: convertCountsToNumbers(otrosOrders),
     })
   }
 
@@ -200,16 +209,13 @@ function EditForm({ data, onSubmit }) {
         Inicial
       </Typography>
       <MaterialTable
-        style={{
-          width: "100%",
-        }}
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "2 años", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "3 años", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "4 años", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "5 años", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "2 años", field: "count2", align: "right", cellStyle: hideIfEmpty },
+          { title: "3 años", field: "count3", align: "right", cellStyle: hideIfEmpty },
+          { title: "4 años", field: "count4", align: "right", cellStyle: hideIfEmpty },
+          { title: "5 años", field: "count5", align: "right", cellStyle: hideIfEmpty },
         ]}
         data={inicialOrders}
         editable={{
@@ -238,12 +244,12 @@ function EditForm({ data, onSubmit }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "1ero", field: "count1", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "2do", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "3ero", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "4to", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "5to", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "6to", field: "count6", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "1ero", field: "count1", align: "right", cellStyle: hideIfEmpty },
+          { title: "2do", field: "count2", align: "right", cellStyle: hideIfEmpty },
+          { title: "3ero", field: "count3", align: "right", cellStyle: hideIfEmpty },
+          { title: "4to", field: "count4", align: "right", cellStyle: hideIfEmpty },
+          { title: "5to", field: "count5", align: "right", cellStyle: hideIfEmpty },
+          { title: "6to", field: "count6", align: "right", cellStyle: hideIfEmpty },
         ]}
         data={primariaOrders}
         editable={{
@@ -272,11 +278,11 @@ function EditForm({ data, onSubmit }) {
         columns={[
           { title: "Titulo", field: "name" },
           { title: "Editorial", field: "editorial" },
-          { title: "1ero", field: "count1", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "2do", field: "count2", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "3ero", field: "count3", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "4to", field: "count4", type: "numeric", cellStyle: hideIfEmpty },
-          { title: "5to", field: "count5", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "1ero", field: "count1", align: "right", cellStyle: hideIfEmpty },
+          { title: "2do", field: "count2", align: "right", cellStyle: hideIfEmpty },
+          { title: "3ero", field: "count3", align: "right", cellStyle: hideIfEmpty },
+          { title: "4to", field: "count4", align: "right", cellStyle: hideIfEmpty },
+          { title: "5to", field: "count5", align: "right", cellStyle: hideIfEmpty },
         ]}
         data={secundariaOrders}
         editable={{
@@ -304,7 +310,7 @@ function EditForm({ data, onSubmit }) {
         }}
         columns={[
           { title: "Titulo", field: "name" },
-          { title: "Cantidad", field: "count", type: "numeric", cellStyle: hideIfEmpty },
+          { title: "Cantidad", field: "count", align: "right", cellStyle: hideIfEmpty },
         ]}
         data={otrosOrders}
         editable={{
@@ -367,25 +373,7 @@ function Edit({ params }) {
   }, [error, throwError, setLocation])
 
   const handleSave = (data) => {
-    editOrder(id, {
-      orderNumber: data.orderNumber,
-      orderDate: new Date(data.orderDate),
-      schoolName: data.schoolName,
-      schoolAddress: data.schoolAddress,
-      schoolDepartment: data.schoolDepartment,
-      schoolProvince: data.schoolProvince,
-      schoolDistrict: data.schoolDistrict,
-      schoolRUC: data.schoolRUC,
-      schoolTelephone: data.schoolTelephone,
-      schoolCellphone: data.schoolCellphone,
-      responsableName: data.responsableName,
-      responsablePosition: data.responsablePosition,
-      responsableEmail: data.responsableEmail,
-      inicialOrders: data.inicialOrders,
-      primariaOrders: data.primariaOrders,
-      secundariaOrders: data.secundariaOrders,
-      otrosOrders: data.otrosOrders,
-    })
+    editOrder(id, data)
     setLocation(`/order/${id}`)
   }
 
