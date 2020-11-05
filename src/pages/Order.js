@@ -109,6 +109,12 @@ function OrderDetails({ data, loading }) {
       <Typography variant="body1">{data.schoolName}</Typography>
       <div style={label}>Dirección</div>
       <Typography variant="body1">{data.schoolAddress}</Typography>
+      <div style={label}>Departamento</div>
+      <Typography variant="body1">{data.schoolDepartment}</Typography>
+      <div style={label}>Provincia</div>
+      <Typography variant="body1">{data.schoolProvince}</Typography>
+      <div style={label}>Distrito</div>
+      <Typography variant="body1">{data.schoolDistrict}</Typography>
       <div style={label}>RUC</div>
       <Typography variant="body1">{data.schoolRUC}</Typography>
       <div style={label}>Teléfono</div>
@@ -261,6 +267,9 @@ const toDocumentData = (data) => {
 
     school: data.schoolName,
     address: data.schoolAddress,
+    department: data.department,
+    province: data.province,
+    district: data.district,
 
     telephone1: data.schoolTelephone[0],
     telephone2: data.schoolTelephone[1],

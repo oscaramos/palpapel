@@ -49,6 +49,9 @@ function EditForm({ data, onSubmit }) {
       orderDate,
       schoolName: data.schoolName,
       schoolAddress: data.schoolAddress,
+      schoolDepartment: data.schoolDepartment,
+      schoolProvince: data.schoolProvince,
+      schoolDistrict: data.schoolDistrict,
       schoolRUC: data.schoolRUC,
       schoolTelephone: data.schoolTelephone,
       schoolCellphone: data.schoolCellphone,
@@ -104,6 +107,30 @@ function EditForm({ data, onSubmit }) {
         name="schoolAddress"
         inputRef={register}
         defaultValue={data.schoolAddress}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Departamento"
+        name="schoolDepartment"
+        inputRef={register}
+        defaultValue={data.schoolDepartment}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Provincia"
+        name="schoolProvince"
+        inputRef={register}
+        defaultValue={data.schoolProvince}
+        fullWidth
+      />
+      <TextField
+        variant="outlined"
+        label="Distrito"
+        name="schoolDistrict"
+        inputRef={register}
+        defaultValue={data.schoolDistrict}
         fullWidth
       />
       <TextField
@@ -345,6 +372,9 @@ function Edit({ params }) {
       orderDate: new Date(data.orderDate),
       schoolName: data.schoolName,
       schoolAddress: data.schoolAddress,
+      schoolDepartment: data.schoolDepartment,
+      schoolProvince: data.schoolProvince,
+      schoolDistrict: data.schoolDistrict,
       schoolRUC: data.schoolRUC,
       schoolTelephone: data.schoolTelephone,
       schoolCellphone: data.schoolCellphone,
