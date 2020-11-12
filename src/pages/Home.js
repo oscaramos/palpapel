@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter"
 import { useAuthState } from "react-firebase-hooks/auth"
 
 import {
-  AppBar,
   Button,
   Container,
   Grid,
@@ -12,21 +11,42 @@ import {
   Menu,
   MenuItem,
   TextField,
-  Toolbar,
   Typography,
+  makeStyles,
 } from "@material-ui/core"
-import Skeleton from "@material-ui/lab/Skeleton"
 
-import SearchIcon from "@material-ui/icons/Search"
-import MenuIcon from "@material-ui/icons/Menu"
+import {
+  PlusCircle as PlusCircleIcon,
+  Menu as MenuIcon,
+  Search as SearchIcon,
+  Filter as FilterIcon,
+} from "react-feather"
 
-import OrderCard from "../components/OrderCard"
+import DocumentCard from "../components/DocumentCard"
+import Navbar from "../components/Navbar"
+
 import { createOrder, useGetAllOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
 
 import { auth } from "../firebase.utils"
 
-function MyOrders({ orders, loading, error }) {
+const useGroupedDocumentsStyles = makeStyles((theme) => ({
+  filterButton: {
+    color: theme.palette.common.gray80,
+    border: `1px solid ${theme.palette.common.gray80}`,
+    borderRadius: 50,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 24,
+    paddingRight: 24,
+  },
+  filterButtonText: {
+    color: theme.palette.common.gray80,
+  },
+}))
+
+function GroupedDocuments({ documents, loading, error }) {
+  const classes = useGroupedDocumentsStyles()
   const { throwError } = useError()
 
   useEffect(() => {
@@ -36,67 +56,101 @@ function MyOrders({ orders, loading, error }) {
   }, [error, throwError])
 
   return (
-    <Grid item>
-      <Typography variant="h2">Mis Ordenes</Typography>
-
-      <Grid
-        container
-        direction="column"
-        spacing={1}
-        style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}
-      >
-        {orders?.map((order) => (
-          <Grid item key={order.id}>
-            <OrderCard
-              id={order.id}
-              responsableName={order.responsableName}
-              orderNumber={order.orderNumber}
-              orderDate={order.orderDisplayDate}
-            />
-          </Grid>
-        ))}
-        {loading && <Skeleton variant="rect" width="100%" height={118} animation="wave" />}
+    <div>
+      <Grid container direction="row" justifyContent="space-between">
+        <Grid item>
+          <Typography variant="h3">Colegio</Typography>
+        </Grid>
+        <Grid item>
+          <Button
+            startIcon={<FilterIcon size={16} color="black" />}
+            variant="outlined"
+            className={classes.filterButton}
+          >
+            <Typography variant="body_reg" className={classes.filterButtonText}>
+              Filtros
+            </Typography>
+          </Button>
+        </Grid>
       </Grid>
-    </Grid>
+
+      <Grid container direction="column" spacing={8}>
+        <Grid
+          item
+          container
+          direction="row"
+          justifyContent="space-between"
+          style={{ marginTop: 32 }}
+        >
+          <Grid item>
+            <Typography variant="h5">Alegría y Felicidad</Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="link_sm">Ver todos</Typography>
+          </Grid>
+          <Grid container direction="column" style={{ paddingTop: 12 }}>
+            {documents?.map((doc) => (
+              <Grid item key={doc.id}>
+                <DocumentCard id={doc.id} number={doc.orderNumber} date={doc.orderDisplayDate} />
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      </Grid>
+    </div>
   )
 }
 
-function SharedWithMe() {
-  return (
-    <Grid item style={{ marginTop: "1rem", marginBottom: "2rem" }}>
-      {/*<Typography variant="h2">Shared With Me</Typography>*/}
-
-      {/*<Grid*/}
-      {/*  container*/}
-      {/*  direction="column"*/}
-      {/*  spacing={1}*/}
-      {/*  style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}*/}
-      {/*></Grid>*/}
-    </Grid>
-  )
-}
-
-function Operations() {
-  const [, setLocation] = useLocation()
+function Documents() {
   const [orders, loading, error] = useGetAllOrders()
 
-  const handleCreateOrder = async () => {
-    const res = await createOrder()
-    setLocation(`/edit/${res.id}`)
-  }
+  return <GroupedDocuments documents={orders} loading={loading} error={error} />
+}
+
+const useNavbarStyles = makeStyles(() => ({
+  inputPlaceholder: {
+    "&::placeholder": {
+      textOverflow: "ellipsis !important",
+      color: "white",
+      opacity: 0.6,
+    },
+  },
+}))
+
+function HomeNavbar({ onOpenMenu, onCreateDocument }) {
+  const classes = useNavbarStyles()
 
   return (
-    <Grid container direction="column">
-      <MyOrders orders={orders} loading={loading} error={error} />
-
-      <SharedWithMe />
-
-      <Grid item>
-        <Button variant="contained" color="primary" fullWidth onClick={handleCreateOrder}>
-          Crear Nueva Orden
-        </Button>
+    <Navbar>
+      <Grid container direction="row" alignItems="center">
+        <Grid item style={{ flexGrow: 1 }}>
+          <Link href="/search">
+            <TextField
+              placeholder="Buscar"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment>
+                    <SearchIcon style={{ marginRight: 10, color: "white" }} />
+                  </InputAdornment>
+                ),
+                classes: {
+                  input: classes.inputPlaceholder,
+                },
+              }}
+              fullWidth
+            />
+          </Link>
+        </Grid>
+        <Grid item style={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}>
+          <IconButton onClick={onCreateDocument}>
+            <PlusCircleIcon color="white" size={24} />
+          </IconButton>
+          <IconButton onClick={onOpenMenu}>
+            <MenuIcon color="white" fontSize="large" />
+          </IconButton>
+        </Grid>
       </Grid>
-    </Grid>
+    </Navbar>
   )
 }
 
@@ -114,49 +168,20 @@ function Home() {
     setAnchorEl(null)
   }
 
-  const logoutUser = () => {
-    auth.signOut()
+  const handleCreateDocument = async () => {
+    const res = await createOrder()
+    setLocation(`/edit/${res.id}`)
   }
 
   useEffect(() => {
     if (!user && !loading) {
-      setLocation("/login")
+      setLocation("/splash")
     }
   }, [user, loading, setLocation])
 
   return (
     <Container maxWidth="sm">
-      <AppBar
-        position="sticky"
-        variant="outlined"
-        style={{ border: "none", backgroundColor: "white" }}
-      >
-        <Toolbar style={{ color: "black" }} disableGutters>
-          <Grid container direction="row" justify="center" alignItems="center">
-            <Grid item style={{ flexGrow: 1 }}>
-              <Link href="/search">
-                <TextField
-                  variant="outlined"
-                  placeholder="Buscar"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment>
-                        <SearchIcon style={{ opacity: "0.4", marginRight: 10 }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  fullWidth
-                />
-              </Link>
-            </Grid>
-            <Grid item style={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}>
-              <IconButton onClick={handleOpenMenu}>
-                <MenuIcon fontSize="large" />
-              </IconButton>
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
+      <HomeNavbar onOpenMenu={handleOpenMenu} onCreateDocument={handleCreateDocument} />
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
@@ -166,7 +191,7 @@ function Home() {
       >
         <MenuItem
           onClick={() => {
-            logoutUser()
+            auth.signOut()
             handleCloseMenu()
           }}
         >
@@ -174,7 +199,7 @@ function Home() {
         </MenuItem>
       </Menu>
 
-      <Operations />
+      <Documents />
     </Container>
   )
 }

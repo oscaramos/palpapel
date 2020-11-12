@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react"
 import { Route, Switch } from "wouter"
 
 import Home from "./pages/Home"
-import Order from "./pages/Order"
-import Edit from "./pages/Edit"
+import Document from "./pages/Document"
 import Search from "./pages/Search"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import Splash from "./pages/Splash"
+
 import Alert from "@material-ui/lab/Alert"
 import Snackbar from "@material-ui/core/Snackbar"
+
 import { ErrorProvider, useError } from "./hooks/useError"
 
 function ErrorPopup() {
@@ -52,8 +54,8 @@ function App() {
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/search" component={Search} />
-        <Route path="/order/:id" component={Order} />
-        <Route path="/edit/:id" component={Edit} />
+        <Route path="/document/:id" component={Document} />
+        <Route path="/splash" component={Splash} />
       </Switch>
       <ErrorPopup />
     </ErrorProvider>

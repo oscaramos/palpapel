@@ -1,20 +1,58 @@
 import React, { useEffect, useState } from "react"
 
-import {
-  AppBar,
-  Container,
-  Grid,
-  InputAdornment,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@material-ui/core"
-import SearchIcon from "@material-ui/icons/Search"
+import { Container, Grid, IconButton, TextField, Typography } from "@material-ui/core"
 
-import OrderCard from "../components/OrderCard"
-import Skeleton from "@material-ui/lab/Skeleton"
+import { ChevronLeft as ArrowLeftIcon } from "react-feather"
+
+import DocumentCard from "../components/DocumentCard"
 import { useGetAllOrders } from "../hooks/useOrders"
 import { useError } from "../hooks/useError"
+import Navbar from "../components/Navbar"
+import { makeStyles } from "@material-ui/core/styles"
+import { Link } from "wouter"
+
+const useNavbarStyles = makeStyles(() => ({
+  inputPlaceholder: {
+    "&::placeholder": {
+      textOverflow: "ellipsis !important",
+      color: "white",
+      opacity: 0.6,
+    },
+  },
+  textInput: {
+    color: "white",
+  },
+}))
+
+function SearchNavbar({ search, setSearch }) {
+  const classes = useNavbarStyles()
+
+  return (
+    <Navbar>
+      <Grid container direction="row" alignItems="center">
+        <Grid item>
+          <Link href="/">
+            <IconButton>
+              <ArrowLeftIcon color="white" size={24} />
+            </IconButton>
+          </Link>
+        </Grid>
+        <Grid item style={{ flexGrow: 1 }}>
+          <TextField
+            placeholder="Buscar"
+            InputProps={{
+              classes: {
+                input: classes.inputPlaceholder,
+              },
+              className: classes.textInput,
+            }}
+            fullWidth
+          />
+        </Grid>
+      </Grid>
+    </Navbar>
+  )
+}
 
 function Search() {
   const [allOrders, loading, error] = useGetAllOrders()
@@ -31,56 +69,24 @@ function Search() {
   const orders = allOrders?.filter((order) => order.orderNumber.startsWith(search))
 
   return (
-    <Container maxWidth="xs">
-      <AppBar
-        position="sticky"
-        variant="outlined"
-        style={{ border: "none", backgroundColor: "white" }}
-      >
-        <Toolbar style={{ color: "black" }} disableGutters>
-          <Grid container direction="row" justify="center">
-            <Grid item style={{ flexGrow: 1 }}>
-              <TextField
-                variant="outlined"
-                placeholder="Buscar"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment>
-                      <SearchIcon style={{ opacity: "0.4", marginRight: 10 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
+    <Container maxWidth="sm">
+      <SearchNavbar search={search} setSearch={setSearch} />
 
-      <Grid container direction="column" style={{ marginTop: "1rem" }}>
+      <Grid container direction="column">
         <Grid item>
-          <Typography variant="h2">Resultados</Typography>
+          <Typography variant="h3">Resultados</Typography>
 
-          <Grid
-            container
-            direction="column"
-            spacing={1}
-            style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}
-          >
+          <div style={{ marginTop: 16 }}>
             {orders?.map((order) => (
               <Grid item key={order.id}>
-                <OrderCard
+                <DocumentCard
                   id={order.id}
-                  responsableName={order.responsableName}
-                  orderNumber={order.orderNumber}
-                  orderDate={order.orderDisplayDate}
+                  number={order.orderNumber}
+                  date={order.orderDisplayDate}
                 />
               </Grid>
             ))}
-            {loading && <Skeleton variant="rect" width="100%" height={118} animation="wave" />}
-          </Grid>
+          </div>
         </Grid>
       </Grid>
     </Container>
