@@ -12,11 +12,12 @@ import { Grid, IconButton, Typography, Container, Button, TextField } from "@mat
 
 import { ChevronLeft as ArrowLeftIcon, Printer as PrintIcon } from "react-feather"
 
-import { deleteOrder, useGetOrder } from "../hooks/useOrders"
+import { useGetDocument } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
 import Navbar from "../components/Navbar"
+import { deleteDocument } from "../utils/documents.firebase"
 
 const hideIfEmpty = (cellData) => {
   if (!cellData) {
@@ -37,10 +38,10 @@ function DocumentDetails({ data, onSubmit }) {
   const [otrosOrders, setOtrosOrders] = useState(data.otrosOrders)
 
   const onSubmitInternal = (data) => {
-    const convertCountsToNumbers = (orders) =>
-      orders.map((order) =>
+    const convertCountsToNumbers = (documents) =>
+      documents.map((document) =>
         Object.fromEntries(
-          Object.entries(order).map(([key, val]) =>
+          Object.entries(document).map(([key, val]) =>
             key.startsWith("count") ? [key, Number(val)] : [key, val]
           )
         )
@@ -70,7 +71,7 @@ function DocumentDetails({ data, onSubmit }) {
   return (
     <form onSubmit={handleSubmit(onSubmitInternal)}>
       <Grid container direction="column" spacing={6}>
-        {/*-- Order --*/}
+        {/*-- Basic Information --*/}
         <Grid item container direction="column" spacing={2}>
           <Grid item>
             <Typography variant="h4">Información Básica</Typography>
@@ -562,24 +563,18 @@ function Document({ params }) {
   const [, setLocation] = useLocation()
   const { throwError } = useError()
 
-  const [getOrder, data, loading, error] = useGetOrder()
-
-  useEffect(() => {
-    if (id) {
-      getOrder(id)
-    }
-  }, [getOrder, id])
+  const [data, loading, error] = useGetDocument(id)
 
   useEffect(() => {
     if (!data && !loading) {
-      throwError("Order does not exists")
+      throwError("Documento no existe")
       setLocation("/")
     }
   }, [throwError, setLocation])
 
   useEffect(() => {
     if (error) {
-      throwError("Error loading order")
+      throwError("Error cargando documento")
       setLocation("/")
     }
   }, [error, throwError, setLocation])
@@ -589,7 +584,7 @@ function Document({ params }) {
   }
 
   const handleDelete = () => {
-    deleteOrder(id)
+    deleteDocument(id)
     setLocation("/")
   }
 

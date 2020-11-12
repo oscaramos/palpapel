@@ -46,6 +46,8 @@ function ErrorPopup() {
   )
 }
 
+// TODO: dont deploy until photos are taken
+
 function App() {
   return (
     <ErrorProvider>

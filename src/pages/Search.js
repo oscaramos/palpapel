@@ -5,7 +5,7 @@ import { Container, Grid, IconButton, TextField, Typography } from "@material-ui
 import { ChevronLeft as ArrowLeftIcon } from "react-feather"
 
 import DocumentCard from "../components/DocumentCard"
-import { useGetAllOrders } from "../hooks/useOrders"
+import { useGetAllDocuments } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 import Navbar from "../components/Navbar"
 import { makeStyles } from "@material-ui/core/styles"
@@ -55,7 +55,7 @@ function SearchNavbar({ search, setSearch }) {
 }
 
 function Search() {
-  const [allOrders, loading, error] = useGetAllOrders()
+  const [documents, loading, error] = useGetAllDocuments()
   const { throwError } = useError()
 
   const [search, setSearch] = useState("")
@@ -66,7 +66,7 @@ function Search() {
     }
   }, [error, throwError])
 
-  const orders = allOrders?.filter((order) => order.orderNumber.startsWith(search))
+  const filteredDocuments = documents?.filter((document) => document.orderNumber.startsWith(search))
 
   return (
     <Container maxWidth="sm">
@@ -77,12 +77,12 @@ function Search() {
           <Typography variant="h3">Resultados</Typography>
 
           <div style={{ marginTop: 16 }}>
-            {orders?.map((order) => (
-              <Grid item key={order.id}>
+            {filteredDocuments?.map((document) => (
+              <Grid item key={document.id}>
                 <DocumentCard
-                  id={order.id}
-                  number={order.orderNumber}
-                  date={order.orderDisplayDate}
+                  id={document.id}
+                  number={document.orderNumber}
+                  date={document.orderDisplayDate}
                 />
               </Grid>
             ))}

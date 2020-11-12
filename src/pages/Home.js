@@ -25,10 +25,11 @@ import {
 import DocumentCard from "../components/DocumentCard"
 import Navbar from "../components/Navbar"
 
-import { createOrder, useGetAllOrders } from "../hooks/useOrders"
+import { useGetAllDocuments } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 
 import { auth } from "../firebase.utils"
+import { createDocument } from "../utils/documents.firebase"
 
 const useGroupedDocumentsStyles = makeStyles((theme) => ({
   filterButton: {
@@ -102,9 +103,9 @@ function GroupedDocuments({ documents, loading, error }) {
 }
 
 function Documents() {
-  const [orders, loading, error] = useGetAllOrders()
+  const [documents, loading, error] = useGetAllDocuments()
 
-  return <GroupedDocuments documents={orders} loading={loading} error={error} />
+  return <GroupedDocuments documents={documents} loading={loading} error={error} />
 }
 
 const useNavbarStyles = makeStyles(() => ({
@@ -169,7 +170,7 @@ function Home() {
   }
 
   const handleCreateDocument = async () => {
-    const res = await createOrder()
+    const res = await createDocument()
     setLocation(`/edit/${res.id}`)
   }
 
