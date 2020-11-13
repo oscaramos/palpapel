@@ -24,6 +24,7 @@
     "react-firebase-hooks": "^2.2.0",
     "react-hook-form": "^6.9.6",
     "react-scripts": "^4.0.0",
+    "react-useunmount": "^1.0.2",
     "wouter": "^2.5.3",
     "yup": "^0.29.3"
   },

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
 import MaterialTable from "material-table"
 import { useForm } from "react-hook-form"
+import { useUnmount } from "react-useunmount"
 
 import DateFnsUtils from "@date-io/date-fns"
 import esLocale from "date-fns/locale/es"
@@ -17,7 +18,7 @@ import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
 import Navbar from "../components/Navbar"
-import { deleteDocument } from "../utils/documents.firebase"
+import { deleteDocument, editDocument } from "../utils/documents.firebase"
 
 const hideIfEmpty = (cellData) => {
   if (!cellData) {
@@ -27,49 +28,86 @@ const hideIfEmpty = (cellData) => {
   }
 }
 
-function DocumentDetails({ data, onSubmit }) {
-  const { register, errors, handleSubmit } = useForm()
-
-  const [orderDate, handleOrderDateChange] = useState(data.orderDate)
-
-  const [inicialOrders, setInicialOrders] = useState(data.inicialOrders)
-  const [primariaOrders, setPrimariaOrders] = useState(data.primariaOrders)
-  const [secundariaOrders, setSecundariaOrders] = useState(data.secundariaOrders)
-  const [otrosOrders, setOtrosOrders] = useState(data.otrosOrders)
-
-  const onSubmitInternal = (data) => {
-    const convertCountsToNumbers = (documents) =>
-      documents.map((document) =>
-        Object.fromEntries(
-          Object.entries(document).map(([key, val]) =>
-            key.startsWith("count") ? [key, Number(val)] : [key, val]
-          )
-        )
+const convertCountsToNumbers = (documents) =>
+  documents.map((document) =>
+    Object.fromEntries(
+      Object.entries(document).map(([key, val]) =>
+        key.startsWith("count") ? [key, Number(val)] : [key, val]
       )
+    )
+  )
 
-    onSubmit({
-      orderNumber: data.orderNumber,
-      orderDate,
-      schoolName: data.schoolName,
-      schoolAddress: data.schoolAddress,
-      schoolDepartment: data.schoolDepartment,
-      schoolProvince: data.schoolProvince,
-      schoolDistrict: data.schoolDistrict,
-      schoolRUC: data.schoolRUC,
-      schoolTelephone: data.schoolTelephone,
-      schoolCellphone: data.schoolCellphone,
-      responsableName: data.responsableName,
-      responsablePosition: data.responsablePosition,
-      responsableEmail: data.responsableEmail,
-      inicialOrders: convertCountsToNumbers(inicialOrders),
-      primariaOrders: convertCountsToNumbers(primariaOrders),
-      secundariaOrders: convertCountsToNumbers(secundariaOrders),
-      otrosOrders: convertCountsToNumbers(otrosOrders),
-    })
+const toFirebaseData = (formData) => {
+  return {
+    orderNumber: formData.orderNumber,
+    orderDate: formData.orderDate,
+    schoolName: formData.schoolName,
+    schoolAddress: formData.schoolAddress,
+    schoolDepartment: formData.schoolDepartment,
+    schoolProvince: formData.schoolProvince,
+    schoolDistrict: formData.schoolDistrict,
+    schoolRUC: formData.schoolRUC,
+    schoolTelephone: formData.schoolTelephone,
+    schoolCellphone: formData.schoolCellphone,
+    responsableName: formData.responsableName,
+    responsablePosition: formData.responsablePosition,
+    responsableEmail: formData.responsableEmail,
+    inicialOrders: convertCountsToNumbers(formData.inicialOrders),
+    primariaOrders: convertCountsToNumbers(formData.primariaOrders),
+    secundariaOrders: convertCountsToNumbers(formData.secundariaOrders),
+    otrosOrders: convertCountsToNumbers(formData.otrosOrders),
   }
+}
+
+function DocumentDetails({ initialData, onIsValidForm, isClickedPrint, onPrint, onEdit }) {
+  const { register, errors, formState, getValues } = useForm({
+    mode: "all",
+  })
+
+  const [orderDate, handleOrderDateChange] = useState(initialData.orderDate)
+
+  const [inicialOrders, setInicialOrders] = useState(initialData.inicialOrders)
+  const [primariaOrders, setPrimariaOrders] = useState(initialData.primariaOrders)
+  const [secundariaOrders, setSecundariaOrders] = useState(initialData.secundariaOrders)
+  const [otrosOrders, setOtrosOrders] = useState(initialData.otrosOrders)
+
+  const completeFormData = useCallback(
+    (formData) => ({
+      ...formData,
+      orderDate,
+      inicialOrders,
+      primariaOrders,
+      secundariaOrders,
+      otrosOrders,
+    }),
+    [orderDate, inicialOrders, primariaOrders, secundariaOrders, otrosOrders]
+  )
+
+  // When unmounting then save data to firestore
+  useUnmount(
+    ([completeFormData]) => {
+      const formData = getValues()
+      const data = toFirebaseData(completeFormData(formData))
+      onEdit(data)
+    },
+    [completeFormData]
+  )
+
+  // Print the saved data
+  useEffect(() => {
+    if (isClickedPrint) {
+      const formData = getValues()
+      const data = toFirebaseData(completeFormData(formData))
+      onPrint(data)
+    }
+  }, [isClickedPrint, completeFormData, getValues, onPrint])
+
+  useEffect(() => {
+    onIsValidForm(formState.isValid)
+  }, [onIsValidForm, formState])
 
   return (
-    <form onSubmit={handleSubmit(onSubmitInternal)}>
+    <form>
       <Grid container direction="column" spacing={6}>
         {/*-- Basic Information --*/}
         <Grid item container direction="column" spacing={2}>
@@ -83,7 +121,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Número"
                 name="orderNumber"
                 inputRef={register}
-                defaultValue={data.orderNumber}
+                defaultValue={initialData.orderNumber}
                 fullWidth
               />
             </Grid>
@@ -113,7 +151,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Nombre"
                 name="schoolName"
                 inputRef={register}
-                defaultValue={data.schoolName}
+                defaultValue={initialData.schoolName}
                 fullWidth
               />
             </Grid>
@@ -124,7 +162,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Dirección"
                 name="schoolAddress"
                 inputRef={register}
-                defaultValue={data.schoolAddress}
+                defaultValue={initialData.schoolAddress}
                 fullWidth
               />
             </Grid>
@@ -135,7 +173,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Departamento"
                 name="schoolDepartment"
                 inputRef={register}
-                defaultValue={data.schoolDepartment}
+                defaultValue={initialData.schoolDepartment}
                 fullWidth
               />
             </Grid>
@@ -146,7 +184,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Provincia"
                 name="schoolProvince"
                 inputRef={register}
-                defaultValue={data.schoolProvince}
+                defaultValue={initialData.schoolProvince}
                 fullWidth
               />
             </Grid>
@@ -157,7 +195,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Distrito"
                 name="schoolDistrict"
                 inputRef={register}
-                defaultValue={data.schoolDistrict}
+                defaultValue={initialData.schoolDistrict}
                 fullWidth
               />
             </Grid>
@@ -172,7 +210,7 @@ function DocumentDetails({ data, onSubmit }) {
                 helperText={
                   Boolean(errors.schoolRUC) ? "El RUC debe contener hasta 11 dígitos" : null
                 }
-                defaultValue={data.schoolRUC}
+                defaultValue={initialData.schoolRUC}
                 fullWidth
               />
             </Grid>
@@ -189,7 +227,7 @@ function DocumentDetails({ data, onSubmit }) {
                     ? "El teléfono debe contener hasta 6 dígitos"
                     : null
                 }
-                defaultValue={data.schoolTelephone}
+                defaultValue={initialData.schoolTelephone}
                 fullWidth
               />
             </Grid>
@@ -206,7 +244,7 @@ function DocumentDetails({ data, onSubmit }) {
                     ? "El celular debe contener hasta 9 dígitos"
                     : null
                 }
-                defaultValue={data.schoolCellphone}
+                defaultValue={initialData.schoolCellphone}
                 fullWidth
               />
             </Grid>
@@ -225,7 +263,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Nombre"
                 name="responsableName"
                 inputRef={register}
-                defaultValue={data.responsableName}
+                defaultValue={initialData.responsableName}
                 fullWidth
               />
             </Grid>
@@ -235,7 +273,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Cargo"
                 name="responsablePosition"
                 inputRef={register}
-                defaultValue={data.responsablePosition}
+                defaultValue={initialData.responsablePosition}
                 fullWidth
               />
             </Grid>
@@ -246,7 +284,7 @@ function DocumentDetails({ data, onSubmit }) {
                 label="Correo Electrónico"
                 name="responsableEmail"
                 inputRef={register}
-                defaultValue={data.responsableEmail}
+                defaultValue={initialData.responsableEmail}
                 fullWidth
               />
             </Grid>
@@ -533,7 +571,7 @@ const toDocumentData = (data) => {
   }
 }
 
-function DocumentNavbar({ onClickPrint }) {
+function DocumentNavbar({ onClickPrint, disabledPrint }) {
   return (
     <Navbar>
       <Grid container direction="row" justifyContent="space-between" alignItems="center">
@@ -548,8 +586,8 @@ function DocumentNavbar({ onClickPrint }) {
           <Typography variant="h5">Documento</Typography>
         </Grid>
         <Grid item>
-          <IconButton onClick={onClickPrint}>
-            <PrintIcon color="white" size={24} />
+          <IconButton onClick={onClickPrint} disabled={disabledPrint}>
+            <PrintIcon color={disabledPrint ? "#CBCBD4" : "white"} size={24} />
           </IconButton>
         </Grid>
       </Grid>
@@ -563,14 +601,17 @@ function Document({ params }) {
   const [, setLocation] = useLocation()
   const { throwError } = useError()
 
-  const [data, loading, error] = useGetDocument(id)
+  const [initialData, loading, error] = useGetDocument(id)
+
+  const [isValidForm, setIsValidForm] = useState(false)
+  const [isClickedPrint, setIsClickedPrint] = useState(false)
 
   useEffect(() => {
-    if (!data && !loading) {
+    if (!initialData && !loading) {
       throwError("Documento no existe")
       setLocation("/")
     }
-  }, [throwError, setLocation])
+  }, [initialData, loading, throwError, setLocation])
 
   useEffect(() => {
     if (error) {
@@ -579,8 +620,13 @@ function Document({ params }) {
     }
   }, [error, throwError, setLocation])
 
-  const handleClickPrint = () => {
+  const handlePrint = (data) => {
     downloadFile(toDocumentData(data))
+    setIsClickedPrint(false)
+  }
+
+  const handleEdit = (data) => {
+    editDocument(id, data)
   }
 
   const handleDelete = () => {
@@ -588,13 +634,34 @@ function Document({ params }) {
     setLocation("/")
   }
 
+  const handleIsValidForm = (valid) => {
+    setIsValidForm(valid)
+  }
+
   return (
     <Container maxWidth="sm">
-      <DocumentNavbar onClickPrint={handleClickPrint} />
+      <DocumentNavbar onClickPrint={() => setIsClickedPrint(true)} disabledPrint={!isValidForm} />
 
-      {data ? <DocumentDetails data={data} loading={loading} /> : "cargando..."}
+      {initialData ? (
+        <DocumentDetails
+          initialData={initialData}
+          loading={loading}
+          onIsValidForm={handleIsValidForm}
+          onEdit={handleEdit}
+          isClickedPrint={isClickedPrint}
+          onPrint={handlePrint}
+        />
+      ) : (
+        "cargando..."
+      )}
 
-      <Button variant="contained" color="secondary" fullWidth onClick={handleDelete}>
+      <Button
+        variant="contained"
+        color="secondary"
+        fullWidth
+        onClick={handleDelete}
+        style={{ marginTop: 16, marginBottom: 64 }}
+      >
         Eliminar
       </Button>
     </Container>
