@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
 import MaterialTable from "material-table"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { useUnmount } from "react-useunmount"
 
 import DateFnsUtils from "@date-io/date-fns"
@@ -68,34 +68,47 @@ function DocumentDetails({
   onPrint,
   onEdit,
 }) {
-  const { register, errors, formState, getValues, reset } = useForm({
+  const { register, errors, formState, getValues, reset, control, setValue, watch } = useForm({
     mode: "onChange",
+    defaultValues: {
+      orderNumber: initialData.orderNumber,
+      schoolName: initialData.schoolName,
+      schoolAddress: initialData.schoolAddress,
+      schoolDepartment: initialData.schoolDepartment,
+      schoolProvince: initialData.schoolProvince,
+      schoolDistrict: initialData.schoolDistrict,
+      schoolRUC: initialData.schoolRUC,
+      schoolTelephone: initialData.schoolTelephone,
+      schoolCellphone: initialData.schoolCellphone,
+      responsableName: initialData.responsableName,
+      responsablePosition: initialData.responsablePosition,
+      responsableEmail: initialData.responsableEmail,
+      orderDate: initialData.orderDate,
+      inicialOrders: initialData.inicialOrders,
+      primariaOrders: initialData.primariaOrders,
+      secundariaOrders: initialData.secundariaOrders,
+      otrosOrders: initialData.otrosOrders,
+    },
   })
 
   const { isValid, isDirty } = formState
 
-  const [orderDate, handleOrderDateChange] = useState(initialData.orderDate)
-  const [inicialOrders, setInicialOrders] = useState(initialData.inicialOrders)
-  const [primariaOrders, setPrimariaOrders] = useState(initialData.primariaOrders)
-  const [secundariaOrders, setSecundariaOrders] = useState(initialData.secundariaOrders)
-  const [otrosOrders, setOtrosOrders] = useState(initialData.otrosOrders)
-
-  const completeFormData = useCallback(
-    (formData) => ({
-      ...formData,
-      orderDate,
-      inicialOrders,
-      primariaOrders,
-      secundariaOrders,
-      otrosOrders,
-    }),
-    [orderDate, inicialOrders, primariaOrders, secundariaOrders, otrosOrders]
-  )
+  const inicialOrders = watch("inicialOrders")
+  const primariaOrders = watch("primariaOrders")
+  const secundariaOrders = watch("secundariaOrders")
+  const otrosOrders = watch("otrosOrders")
 
   const getFirebaseData = useCallback(() => {
-    const formData = getValues()
-    return toFirebaseData(completeFormData(formData))
-  }, [completeFormData, getValues])
+    return toFirebaseData(getValues())
+  }, [getValues])
+
+  // Register tables to react-hook-form
+  useEffect(() => {
+    register("inicialOrders")
+    register("primariaOrders")
+    register("secundariaOrders")
+    register("otrosOrders")
+  }, [register])
 
   // Print the saved data
   useEffect(() => {
@@ -109,10 +122,10 @@ function DocumentDetails({
     if (isClickedEdit) {
       // Editing the saved data
       onEdit(getFirebaseData())
-      // Reset isDirtyForm to disable save button
+      // Reset isDirtyForm with current data to disable save button
       reset(getValues())
     }
-  }, [isClickedEdit, getFirebaseData, onEdit])
+  }, [isClickedEdit, getFirebaseData, onEdit, getValues, reset])
 
   // Events listeners for parent component
   useEffect(() => {
@@ -146,17 +159,17 @@ function DocumentDetails({
                 label="Número"
                 name="orderNumber"
                 inputRef={register}
-                defaultValue={initialData.orderNumber}
                 fullWidth
               />
             </Grid>
             <Grid item>
               <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
-                <DatePicker
+                <Controller
+                  as={DatePicker}
+                  name="orderDate"
                   label="Fecha"
-                  value={orderDate}
-                  onChange={handleOrderDateChange}
                   inputVariant="outlined"
+                  control={control}
                   fullWidth
                 />
               </MuiPickersUtilsProvider>
@@ -176,7 +189,6 @@ function DocumentDetails({
                 label="Nombre"
                 name="schoolName"
                 inputRef={register}
-                defaultValue={initialData.schoolName}
                 fullWidth
               />
             </Grid>
@@ -187,7 +199,6 @@ function DocumentDetails({
                 label="Dirección"
                 name="schoolAddress"
                 inputRef={register}
-                defaultValue={initialData.schoolAddress}
                 fullWidth
               />
             </Grid>
@@ -198,7 +209,6 @@ function DocumentDetails({
                 label="Departamento"
                 name="schoolDepartment"
                 inputRef={register}
-                defaultValue={initialData.schoolDepartment}
                 fullWidth
               />
             </Grid>
@@ -209,7 +219,6 @@ function DocumentDetails({
                 label="Provincia"
                 name="schoolProvince"
                 inputRef={register}
-                defaultValue={initialData.schoolProvince}
                 fullWidth
               />
             </Grid>
@@ -220,7 +229,6 @@ function DocumentDetails({
                 label="Distrito"
                 name="schoolDistrict"
                 inputRef={register}
-                defaultValue={initialData.schoolDistrict}
                 fullWidth
               />
             </Grid>
@@ -230,12 +238,11 @@ function DocumentDetails({
                 variant="outlined"
                 label="RUC"
                 name="schoolRUC"
-                inputRef={register({ required: true, maxLength: 11 })}
+                inputRef={register({ maxLength: 11 })}
                 error={Boolean(errors.schoolRUC)}
                 helperText={
                   Boolean(errors.schoolRUC) ? "El RUC debe contener hasta 11 dígitos" : null
                 }
-                defaultValue={initialData.schoolRUC}
                 fullWidth
               />
             </Grid>
@@ -245,14 +252,13 @@ function DocumentDetails({
                 variant="outlined"
                 label="Teléfono fijo"
                 name="schoolTelephone"
-                inputRef={register({ required: true, maxLength: 6 })}
+                inputRef={register({ maxLength: 6 })}
                 error={Boolean(errors.schoolTelephone)}
                 helperText={
                   Boolean(errors.schoolTelephone)
                     ? "El teléfono debe contener hasta 6 dígitos"
                     : null
                 }
-                defaultValue={initialData.schoolTelephone}
                 fullWidth
               />
             </Grid>
@@ -262,14 +268,13 @@ function DocumentDetails({
                 variant="outlined"
                 label="Celular"
                 name="schoolCellphone"
-                inputRef={register({ required: true, maxLength: 9 })}
+                inputRef={register({ maxLength: 9 })}
                 error={Boolean(errors.schoolCellphone)}
                 helperText={
                   Boolean(errors.schoolCellphone)
                     ? "El celular debe contener hasta 9 dígitos"
                     : null
                 }
-                defaultValue={initialData.schoolCellphone}
                 fullWidth
               />
             </Grid>
@@ -288,7 +293,6 @@ function DocumentDetails({
                 label="Nombre"
                 name="responsableName"
                 inputRef={register}
-                defaultValue={initialData.responsableName}
                 fullWidth
               />
             </Grid>
@@ -298,7 +302,6 @@ function DocumentDetails({
                 label="Cargo"
                 name="responsablePosition"
                 inputRef={register}
-                defaultValue={initialData.responsablePosition}
                 fullWidth
               />
             </Grid>
@@ -309,7 +312,6 @@ function DocumentDetails({
                 label="Correo Electrónico"
                 name="responsableEmail"
                 inputRef={register}
-                defaultValue={initialData.responsableEmail}
                 fullWidth
               />
             </Grid>
@@ -338,7 +340,7 @@ function DocumentDetails({
                     const dataUpdate = [...inicialOrders]
                     const index = oldData.tableData.id
                     dataUpdate[index] = newData
-                    setInicialOrders([...dataUpdate])
+                    setValue("inicialOrders", [...dataUpdate], { shouldDirty: true })
                   },
                 }}
                 options={{
@@ -380,7 +382,7 @@ function DocumentDetails({
                     const dataUpdate = [...primariaOrders]
                     const index = oldData.tableData.id
                     dataUpdate[index] = newData
-                    setPrimariaOrders([...dataUpdate])
+                    setValue("primariaOrders", [...dataUpdate], { shouldDirty: true })
                   },
                 }}
                 options={{
@@ -421,7 +423,7 @@ function DocumentDetails({
                     const dataUpdate = [...secundariaOrders]
                     const index = oldData.tableData.id
                     dataUpdate[index] = newData
-                    setSecundariaOrders([...dataUpdate])
+                    setValue("secundariaOrders", [...dataUpdate], { shouldDirty: true })
                   },
                 }}
                 options={{
@@ -457,7 +459,7 @@ function DocumentDetails({
                     const dataUpdate = [...otrosOrders]
                     const index = oldData.tableData.id
                     dataUpdate[index] = newData
-                    setOtrosOrders([...dataUpdate])
+                    setValue("otrosOrders", [...dataUpdate], { shouldDirty: true })
                   },
                 }}
                 options={{
@@ -663,6 +665,7 @@ function Document({ params }) {
 
   const handleEdit = (data) => {
     editDocument(id, data)
+    setIsClickedEdit(false)
   }
 
   const handleDelete = () => {
