@@ -7,6 +7,8 @@ import Search from "./pages/Search"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Splash from "./pages/Splash"
+import Filter from "./pages/Filter"
+import NotFound from "./pages/NotFound"
 
 import Alert from "@material-ui/lab/Alert"
 import Snackbar from "@material-ui/core/Snackbar"
@@ -58,6 +60,8 @@ function App() {
         <Route path="/search" component={Search} />
         <Route path="/document/:id" component={Document} />
         <Route path="/splash" component={Splash} />
+        <Route path="/filter" component={Filter} />
+        <Route component={NotFound} />
       </Switch>
       <ErrorPopup />
     </ErrorProvider>

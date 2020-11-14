@@ -63,15 +63,17 @@ function GroupedDocuments({ documents, loading, error }) {
           <Typography variant="h3">Colegio</Typography>
         </Grid>
         <Grid item>
-          <Button
-            startIcon={<FilterIcon size={16} color="black" />}
-            variant="outlined"
-            className={classes.filterButton}
-          >
-            <Typography variant="body_reg" className={classes.filterButtonText}>
-              Filtros
-            </Typography>
-          </Button>
+          <Link href="/filter">
+            <Button
+              startIcon={<FilterIcon size={16} color="black" />}
+              variant="outlined"
+              className={classes.filterButton}
+            >
+              <Typography variant="body_reg" className={classes.filterButtonText}>
+                Filtros
+              </Typography>
+            </Button>
+          </Link>
         </Grid>
       </Grid>
 
