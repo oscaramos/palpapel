@@ -7,11 +7,11 @@ import { useUnmount } from "react-useunmount"
 
 import DateFnsUtils from "@date-io/date-fns"
 import esLocale from "date-fns/locale/es"
-import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers"
+import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers"
 
-import { Grid, IconButton, Typography, Container, Button, TextField } from "@material-ui/core"
+import { Button, Container, Grid, IconButton, TextField, Typography } from "@material-ui/core"
 
-import { ChevronLeft as ArrowLeftIcon, Printer as PrintIcon } from "react-feather"
+import { ChevronLeft as ArrowLeftIcon, Printer as PrintIcon, Save as SaveIcon } from "react-feather"
 
 import { useGetDocument } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
@@ -59,13 +59,22 @@ const toFirebaseData = (formData) => {
   }
 }
 
-function DocumentDetails({ initialData, onIsValidForm, isClickedPrint, onPrint, onEdit }) {
-  const { register, errors, formState, getValues } = useForm({
-    mode: "all",
+function DocumentDetails({
+  initialData,
+  onIsValidForm,
+  onIsDirtyForm,
+  isClickedPrint,
+  isClickedEdit,
+  onPrint,
+  onEdit,
+}) {
+  const { register, errors, formState, getValues, reset } = useForm({
+    mode: "onChange",
   })
 
-  const [orderDate, handleOrderDateChange] = useState(initialData.orderDate)
+  const { isValid, isDirty } = formState
 
+  const [orderDate, handleOrderDateChange] = useState(initialData.orderDate)
   const [inicialOrders, setInicialOrders] = useState(initialData.inicialOrders)
   const [primariaOrders, setPrimariaOrders] = useState(initialData.primariaOrders)
   const [secundariaOrders, setSecundariaOrders] = useState(initialData.secundariaOrders)
@@ -83,28 +92,44 @@ function DocumentDetails({ initialData, onIsValidForm, isClickedPrint, onPrint, 
     [orderDate, inicialOrders, primariaOrders, secundariaOrders, otrosOrders]
   )
 
-  // When unmounting then save data to firestore
-  useUnmount(
-    ([completeFormData]) => {
-      const formData = getValues()
-      const data = toFirebaseData(completeFormData(formData))
-      onEdit(data)
-    },
-    [completeFormData]
-  )
+  const getFirebaseData = useCallback(() => {
+    const formData = getValues()
+    return toFirebaseData(completeFormData(formData))
+  }, [completeFormData, getValues])
 
   // Print the saved data
   useEffect(() => {
     if (isClickedPrint) {
-      const formData = getValues()
-      const data = toFirebaseData(completeFormData(formData))
-      onPrint(data)
+      onPrint(getFirebaseData())
     }
-  }, [isClickedPrint, completeFormData, getValues, onPrint])
+  }, [isClickedPrint, getFirebaseData, onPrint])
+
+  // Edit the saved data
+  useEffect(() => {
+    if (isClickedEdit) {
+      // Editing the saved data
+      onEdit(getFirebaseData())
+      // Reset isDirtyForm to disable save button
+      reset(getValues())
+    }
+  }, [isClickedEdit, getFirebaseData, onEdit])
+
+  // Events listeners for parent component
+  useEffect(() => {
+    onIsValidForm(isValid)
+  }, [onIsValidForm, isValid])
 
   useEffect(() => {
-    onIsValidForm(formState.isValid)
-  }, [onIsValidForm, formState])
+    onIsDirtyForm(isDirty)
+  }, [onIsDirtyForm, isDirty])
+
+  // When unmounting then save data to firestore
+  useUnmount(
+    ([getFirebaseData]) => {
+      onEdit(getFirebaseData())
+    },
+    [getFirebaseData]
+  )
 
   return (
     <form>
@@ -571,7 +596,7 @@ const toDocumentData = (data) => {
   }
 }
 
-function DocumentNavbar({ onClickPrint, disabledPrint }) {
+function DocumentNavbar({ onClickPrint, onClickEdit, disableEdit, disablePrint }) {
   return (
     <Navbar>
       <Grid container direction="row" justifyContent="space-between" alignItems="center">
@@ -586,9 +611,18 @@ function DocumentNavbar({ onClickPrint, disabledPrint }) {
           <Typography variant="h5">Documento</Typography>
         </Grid>
         <Grid item>
-          <IconButton onClick={onClickPrint} disabled={disabledPrint}>
-            <PrintIcon color={disabledPrint ? "#CBCBD4" : "white"} size={24} />
-          </IconButton>
+          <Grid container direction="row">
+            <Grid item>
+              <IconButton onClick={onClickEdit} disabled={disableEdit}>
+                <SaveIcon color={disableEdit ? "#A6A6AA" : "white"} size={24} />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <IconButton onClick={onClickPrint} disabled={disablePrint}>
+                <PrintIcon color={disablePrint ? "#A6A6AA" : "white"} size={24} />
+              </IconButton>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Navbar>
@@ -604,7 +638,9 @@ function Document({ params }) {
   const [initialData, loading, error] = useGetDocument(id)
 
   const [isValidForm, setIsValidForm] = useState(false)
+  const [isDirtyForm, setIsDirtyForm] = useState(false)
   const [isClickedPrint, setIsClickedPrint] = useState(false)
+  const [isClickedEdit, setIsClickedEdit] = useState(false)
 
   useEffect(() => {
     if (!initialData && !loading) {
@@ -638,18 +674,29 @@ function Document({ params }) {
     setIsValidForm(valid)
   }
 
+  const handleIsDirtyForm = (dirty) => {
+    setIsDirtyForm(dirty)
+  }
+
   return (
     <Container maxWidth="sm">
-      <DocumentNavbar onClickPrint={() => setIsClickedPrint(true)} disabledPrint={!isValidForm} />
+      <DocumentNavbar
+        onClickPrint={() => setIsClickedPrint(true)}
+        disablePrint={!isValidForm}
+        disableEdit={!isValidForm || !isDirtyForm}
+        onClickEdit={() => setIsClickedEdit(true)}
+      />
 
       {initialData ? (
         <DocumentDetails
           initialData={initialData}
           loading={loading}
           onIsValidForm={handleIsValidForm}
-          onEdit={handleEdit}
+          onIsDirtyForm={handleIsDirtyForm}
           isClickedPrint={isClickedPrint}
+          isClickedEdit={isClickedEdit}
           onPrint={handlePrint}
+          onEdit={handleEdit}
         />
       ) : (
         "cargando..."
