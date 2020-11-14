@@ -171,7 +171,7 @@ function Home() {
 
   const handleCreateDocument = async () => {
     const res = await createDocument()
-    setLocation(`/edit/${res.id}`)
+    setLocation(`/document/${res.id}`)
   }
 
   useEffect(() => {
