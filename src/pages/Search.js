@@ -46,6 +46,8 @@ function SearchNavbar({ search, setSearch }) {
               },
               className: classes.textInput,
             }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             fullWidth
           />
         </Grid>
@@ -55,7 +57,7 @@ function SearchNavbar({ search, setSearch }) {
 }
 
 function Search() {
-  const [documents, loading, error] = useGetAllDocuments()
+  const [documents, , error] = useGetAllDocuments()
   const { throwError } = useError()
 
   const [search, setSearch] = useState("")
@@ -66,7 +68,7 @@ function Search() {
     }
   }, [error, throwError])
 
-  const filteredDocuments = documents?.filter((document) => document.orderNumber.startsWith(search))
+  const filteredDocuments = documents?.filter((document) => document.number.includes(search))
 
   return (
     <Container maxWidth="sm">
@@ -81,8 +83,8 @@ function Search() {
               <Grid item key={document.id}>
                 <DocumentCard
                   id={document.id}
-                  number={document.orderNumber}
-                  date={document.orderDisplayDate}
+                  number={document.number}
+                  date={document.displayDate}
                 />
               </Grid>
             ))}
