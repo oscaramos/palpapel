@@ -8,30 +8,53 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  makeStyles,
   Menu,
   MenuItem,
   TextField,
   Typography,
-  makeStyles,
 } from "@material-ui/core"
 
 import {
-  PlusCircle as PlusCircleIcon,
-  Menu as MenuIcon,
-  Search as SearchIcon,
   Filter as FilterIcon,
+  Menu as MenuIcon,
+  PlusCircle as PlusCircleIcon,
+  Search as SearchIcon,
 } from "react-feather"
 
 import DocumentCard from "../components/DocumentCard"
 import Navbar from "../components/Navbar"
 
-import { useGetAllDocuments } from "../hooks/useDocuments"
+import { useGetGroupedDocuments, useUserData } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 
 import { auth } from "../firebase.utils"
 import { createDocument } from "../utils/documents.firebase"
 
-const useGroupedDocumentsStyles = makeStyles((theme) => ({
+function GroupedDocuments({ title, documents, loading }) {
+  return (
+    <Grid item container direction="row" justifyContent="space-between" style={{ marginTop: 32 }}>
+      {/*-- Mini header --*/}
+      <Grid item>
+        <Typography variant="h5">{title}</Typography>
+      </Grid>
+      <Grid item>
+        <Typography variant="link_sm">Ver todos</Typography>
+      </Grid>
+
+      {/*-- Documents --*/}
+      <Grid container direction="column" style={{ paddingTop: 12 }}>
+        {documents?.map((doc) => (
+          <Grid item key={doc.id}>
+            <DocumentCard id={doc.id} number={doc.number} date={doc.displayDate} />
+          </Grid>
+        ))}
+      </Grid>
+    </Grid>
+  )
+}
+
+const useDocumentsStyles = makeStyles((theme) => ({
   filterButton: {
     color: theme.palette.common.gray80,
     border: `1px solid ${theme.palette.common.gray80}`,
@@ -46,8 +69,10 @@ const useGroupedDocumentsStyles = makeStyles((theme) => ({
   },
 }))
 
-function GroupedDocuments({ documents, loading, error }) {
-  const classes = useGroupedDocumentsStyles()
+function DocumentsWithFilters({ filters }) {
+  const classes = useDocumentsStyles()
+  const [documentGroups, loading, error] = useGetGroupedDocuments(filters)
+
   const { throwError } = useError()
 
   useEffect(() => {
@@ -58,6 +83,7 @@ function GroupedDocuments({ documents, loading, error }) {
 
   return (
     <div>
+      {/*-- Filter Navbar --*/}
       <Grid container direction="row" justifyContent="space-between">
         <Grid item>
           <Typography variant="h3">Colegio</Typography>
@@ -77,37 +103,29 @@ function GroupedDocuments({ documents, loading, error }) {
         </Grid>
       </Grid>
 
-      <Grid container direction="column" spacing={8}>
-        <Grid
-          item
-          container
-          direction="row"
-          justifyContent="space-between"
-          style={{ marginTop: 32 }}
-        >
+      {/*-- Grouped Documents list --*/}
+      <Grid container direction="column" spacing={6}>
+        {documentGroups?.map((documents) => (
           <Grid item>
-            <Typography variant="h5">Alegría y Felicidad</Typography>
+            <GroupedDocuments
+              title={documents.title}
+              documents={documents.data}
+              loading={loading}
+            />
           </Grid>
-          <Grid item>
-            <Typography variant="link_sm">Ver todos</Typography>
-          </Grid>
-          <Grid container direction="column" style={{ paddingTop: 12 }}>
-            {documents?.map((doc) => (
-              <Grid item key={doc.id}>
-                <DocumentCard id={doc.id} number={doc.orderNumber} date={doc.orderDisplayDate} />
-              </Grid>
-            ))}
-          </Grid>
-        </Grid>
+        ))}
       </Grid>
     </div>
   )
 }
 
 function Documents() {
-  const [documents, loading, error] = useGetAllDocuments()
+  const [userData, loading, error] = useUserData()
 
-  return <GroupedDocuments documents={documents} loading={loading} error={error} />
+  if (error) return "error"
+  if (loading) return "cargando..."
+
+  return <DocumentsWithFilters filters={userData.filters} />
 }
 
 const useNavbarStyles = makeStyles(() => ({
