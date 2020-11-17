@@ -1,8 +1,7 @@
-import React, { useEffect } from "react"
+import React from "react"
 import * as yup from "yup"
-import { Link, useLocation } from "wouter"
+import { Link } from "wouter"
 import { useForm } from "react-hook-form"
-import { useAuthState } from "react-firebase-hooks/auth"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 import { Button, Container, Grid, Link as MuiLink, TextField, Typography } from "@material-ui/core"
@@ -19,8 +18,6 @@ const schema = yup.object().shape({
 })
 
 function Login() {
-  const [, setLocation] = useLocation()
-  const [user, loading] = useAuthState(auth)
   const { register, errors, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
@@ -38,14 +35,6 @@ function Login() {
       }
     })
   }
-
-  useEffect(() => {
-    if (user && !loading) {
-      setLocation("/")
-    }
-  }, [user, loading, setLocation])
-
-  console.log(errors)
 
   return (
     <Container maxWidth="xs">

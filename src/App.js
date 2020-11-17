@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Route, Switch } from "wouter"
+import { Redirect, Route as WouterRoute, Switch } from "wouter"
 
 import Home from "./pages/Home"
 import Document from "./pages/Document"
@@ -9,11 +9,14 @@ import Register from "./pages/Register"
 import Splash from "./pages/Splash"
 import Filter from "./pages/Filter"
 import NotFound from "./pages/NotFound"
+import SeeGroup from "./pages/SeeGroup"
 
 import Alert from "@material-ui/lab/Alert"
 import Snackbar from "@material-ui/core/Snackbar"
 
 import { ErrorProvider, useError } from "./hooks/useError"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { auth } from "./firebase.utils"
 
 function ErrorPopup() {
   const { message } = useError()
@@ -48,19 +51,39 @@ function ErrorPopup() {
   )
 }
 
-// TODO: dont deploy until photos are taken
+// unauthenticated users will go to /splash
+function Route({ authOnly, loginOnly, ...rest }) {
+  const [user, loading] = useAuthState(auth)
+
+  if (loading) {
+    return "cargando..."
+  }
+
+  if (!user && authOnly) {
+    return <Redirect to="/splash" />
+  }
+
+  if (user && loginOnly) {
+    return <Redirect to="/" />
+  }
+
+  return <WouterRoute {...rest} />
+}
 
 function App() {
   return (
     <ErrorProvider>
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/search" component={Search} />
-        <Route path="/document/:id" component={Document} />
-        <Route path="/splash" component={Splash} />
-        <Route path="/filter" component={Filter} />
+        <Route authOnly path="/" component={Home} />
+        <Route authOnly path="/search" component={Search} />
+        <Route authOnly path="/filter" component={Filter} />
+        <Route authOnly path="/seeGroup" component={SeeGroup} />
+        <Route authOnly path="/document/:id" component={Document} />
+
+        <Route loginOnly path="/splash" component={Splash} />
+        <Route loginOnly path="/login" component={Login} />
+        <Route loginOnly path="/register" component={Register} />
+
         <Route component={NotFound} />
       </Switch>
       <ErrorPopup />

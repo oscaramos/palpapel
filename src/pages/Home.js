@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "wouter"
-import { useAuthState } from "react-firebase-hooks/auth"
 
 import {
   Button,
@@ -50,7 +49,7 @@ function GroupedDocuments({ title, documents, loading }) {
           </Grid>
         ))}
       </Grid>
-    </Grid>
+    </div>
   )
 }
 
@@ -177,7 +176,6 @@ function HomeNavbar({ onOpenMenu, onCreateDocument }) {
 
 function Home() {
   const [, setLocation] = useLocation()
-  const [user, loading] = useAuthState(auth)
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -193,12 +191,6 @@ function Home() {
     const res = await createDocument()
     setLocation(`/document/${res.id}`)
   }
-
-  useEffect(() => {
-    if (!user && !loading) {
-      setLocation("/splash")
-    }
-  }, [user, loading, setLocation])
 
   return (
     <Container maxWidth="sm">

@@ -1,7 +1,6 @@
-import React, { useEffect } from "react"
-import { Link, useLocation } from "wouter"
+import React from "react"
+import { Link } from "wouter"
 import { useForm } from "react-hook-form"
-import { useAuthState } from "react-firebase-hooks/auth"
 import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
 
@@ -21,22 +20,14 @@ const schema = yup.object().shape({
 })
 
 function Register() {
-  const [, setLocation] = useLocation()
   const { register, errors, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   })
-  const [user] = useAuthState(auth)
 
   const registerUser = (data) => {
     auth.createUserWithEmailAndPassword(data.email, data.password)
   }
-
-  useEffect(() => {
-    if (user) {
-      setLocation("/")
-    }
-  }, [user, setLocation])
 
   return (
     <Container maxWidth="xs">
