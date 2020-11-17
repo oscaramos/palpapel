@@ -65,15 +65,32 @@ const groupBy = (xs, key) =>
 const object2KeyValueArray = (obj, keyName, valueName) =>
   Object.entries(obj).map(([key, value]) => ({ [keyName]: key, [valueName]: value }))
 
-export function useGetGroupedDocuments({ groupBy: groupByKey, orderBy }) {
+const groupByValues = ["schoolName", "responsable", "displayDate", null]
+
+const orderByValues = ["asc", "desc", null]
+
+export function useGetGroupedDocuments({ groupBy: groupByKey, orderBy = "asc" }) {
   const [documents, loading, error] = useGetAllDocuments()
+
+  // validation
+  if (!groupByValues.includes(groupByKey)) {
+    return [null, false, { message: "El parámetro groupBy es invalido" }]
+  }
+  if (!orderByValues.includes(orderBy)) {
+    return [null, false, { message: "El parámetro orderBy es invalido" }]
+  }
   if (!documents) return [null, loading, error]
+  if (!groupByKey || !orderBy) return [null, loading, error]
+
   // grouping the documents
   const groupedDocuments = object2KeyValueArray(groupBy(documents, groupByKey), "title", "data")
+
   // sorting the documents
   groupedDocuments.sort((a, b) => b.title.localeCompare(a.title))
+
   // if not ascendant order, then its descendent
   if (orderBy !== "asc") groupedDocuments.reverse()
+
   return [groupedDocuments, loading, error]
 }
 

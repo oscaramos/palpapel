@@ -21,8 +21,8 @@ import {
   Search as SearchIcon,
 } from "react-feather"
 
-import DocumentCard from "../components/DocumentCard"
 import Navbar from "../components/Navbar"
+import DocumentsRows from "../components/DocumentsRows"
 
 import { useGetGroupedDocuments, useUserData } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
@@ -30,25 +30,27 @@ import { useError } from "../hooks/useError"
 import { auth } from "../firebase.utils"
 import { createDocument } from "../utils/documents.firebase"
 
-function GroupedDocuments({ title, documents, loading }) {
+function GroupedDocuments({ title, documents, limit, groupBy }) {
+  // take the first x documents
+  // if limit is undefined then take all documents
+  const limitedDocuments = documents.slice(0, limit)
+
   return (
-    <Grid item container direction="row" justifyContent="space-between" style={{ marginTop: 32 }}>
+    <div>
       {/*-- Mini header --*/}
-      <Grid item>
-        <Typography variant="h5">{title}</Typography>
-      </Grid>
-      <Grid item>
-        <Typography variant="link_sm">Ver todos</Typography>
+      <Grid item container direction="row" justifyContent="space-between" style={{ marginTop: 32 }}>
+        <Grid item>
+          <Typography variant="h5">{title}</Typography>
+        </Grid>
+        <Grid item>
+          <Link href={`/seeGroup/${title}?groupBy=${groupBy}`}>
+            <Typography variant="link_sm">Ver todos</Typography>
+          </Link>
+        </Grid>
       </Grid>
 
-      {/*-- Documents --*/}
-      <Grid container direction="column" style={{ paddingTop: 12 }}>
-        {documents?.map((doc) => (
-          <Grid item key={doc.id}>
-            <DocumentCard id={doc.id} number={doc.number} date={doc.displayDate} />
-          </Grid>
-        ))}
-      </Grid>
+      {/*-- Documents Rows --*/}
+      <DocumentsRows documents={limitedDocuments} />
     </div>
   )
 }
@@ -68,15 +70,21 @@ const useDocumentsStyles = makeStyles((theme) => ({
   },
 }))
 
-function DocumentsWithFilters({ filters }) {
+const defaultFilters = { groupBy: null, orderBy: null }
+
+function Documents() {
   const classes = useDocumentsStyles()
+  const [userData] = useUserData()
+
+  const filters = userData?.filters ?? defaultFilters
   const [documentGroups, loading, error] = useGetGroupedDocuments(filters)
+  const { groupBy } = filters
 
   const { throwError } = useError()
 
   useEffect(() => {
     if (error) {
-      throwError("Error cargando mis ordenes")
+      throwError(`Error cargando mis ordenes: ${error.message}`)
     }
   }, [error, throwError])
 
@@ -105,26 +113,19 @@ function DocumentsWithFilters({ filters }) {
       {/*-- Grouped Documents list --*/}
       <Grid container direction="column" spacing={6}>
         {documentGroups?.map((documents) => (
-          <Grid item>
+          <Grid item key={documentGroups.title}>
             <GroupedDocuments
               title={documents.title}
               documents={documents.data}
               loading={loading}
+              limit={5}
+              groupBy={groupBy}
             />
           </Grid>
         ))}
       </Grid>
     </div>
   )
-}
-
-function Documents() {
-  const [userData, loading, error] = useUserData()
-
-  if (error) return "error"
-  if (loading) return "cargando..."
-
-  return <DocumentsWithFilters filters={userData.filters} />
 }
 
 const useNavbarStyles = makeStyles(() => ({

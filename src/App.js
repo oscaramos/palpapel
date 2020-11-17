@@ -77,7 +77,7 @@ function App() {
         <Route authOnly path="/" component={Home} />
         <Route authOnly path="/search" component={Search} />
         <Route authOnly path="/filter" component={Filter} />
-        <Route authOnly path="/seeGroup" component={SeeGroup} />
+        <Route authOnly path="/seeGroup/:title" component={SeeGroup} />
         <Route authOnly path="/document/:id" component={Document} />
 
         <Route loginOnly path="/splash" component={Splash} />
