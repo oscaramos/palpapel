@@ -5,42 +5,13 @@ import { useForm } from "react-hook-form"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { yupResolver } from "@hookform/resolvers/yup"
 
-import {
-  Container,
-  TextField,
-  Button,
-  Link as MuiLink,
-  Grid,
-  Typography,
-  IconButton,
-} from "@material-ui/core"
+import { Button, Container, Grid, Link as MuiLink, TextField, Typography } from "@material-ui/core"
 
-import { X as CloseIcon } from "react-feather"
-
+import CloserNavbar from "../components/CloserNavbar"
 import { auth } from "../firebase.utils"
 import { useError } from "../hooks/useError"
-import Navbar from "../components/Navbar"
 
 import { ReactComponent as Logo } from "../assets/logo.svg"
-
-function LoginNavbar() {
-  return (
-    <Navbar maxWidth="xs">
-      <Grid container direction="column" alignItems="center" justifyContent="center">
-        <Grid item style={{ position: "absolute", alignSelf: "flex-start" }}>
-          <IconButton>
-            <Link href="/splash">
-              <CloseIcon color="white" size={24} />
-            </Link>
-          </IconButton>
-        </Grid>
-        <Grid item>
-          <Typography variant="h5">Iniciar Sesión</Typography>
-        </Grid>
-      </Grid>
-    </Navbar>
-  )
-}
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -78,7 +49,7 @@ function Login() {
 
   return (
     <Container maxWidth="xs">
-      <LoginNavbar />
+      <CloserNavbar href="/splash" title="Iniciar Sesión" />
 
       <Grid container direction="column" alignItems="center" spacing={1}>
         <Grid item>

@@ -1,32 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { Link, useLocation } from "wouter"
+import { useLocation } from "wouter"
 
-import { IconButton, Typography, Container, Chip, Button, Grid } from "@material-ui/core"
-import { X as CloseIcon } from "react-feather"
+import { Button, Chip, Container, Grid, Typography } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 
-import Navbar from "../components/Navbar"
 import { useUserData } from "../hooks/useDocuments"
 import { editUserDataFilters } from "../utils/user.firebase"
-
-function FilterNavbar() {
-  return (
-    <Navbar maxWidth="xs">
-      <Grid container direction="column" alignItems="center" justifyContent="center">
-        <Grid item style={{ position: "absolute", alignSelf: "flex-start" }}>
-          <IconButton>
-            <Link href="/">
-              <CloseIcon color="white" size={24} />
-            </Link>
-          </IconButton>
-        </Grid>
-        <Grid item>
-          <Typography variant="h5">Filtros</Typography>
-        </Grid>
-      </Grid>
-    </Navbar>
-  )
-}
+import CloserNavbar from "../components/CloserNavbar"
 
 const useStyles = makeStyles(() => ({
   selectedChip: {
@@ -76,7 +56,7 @@ function FilterWithData({ filterData, onEdit, clickedEdit }) {
         orderBy,
       })
     }
-  }, [clickedEdit])
+  }, [clickedEdit, onEdit, groupBy, orderBy])
 
   return (
     <Grid container direction="column" spacing={6}>
@@ -136,7 +116,7 @@ function Filter() {
 
   return (
     <Container maxWidth="xs">
-      <FilterNavbar />
+      <CloserNavbar href="/" title="Filtros" />
 
       {loading ? (
         "cargando..."

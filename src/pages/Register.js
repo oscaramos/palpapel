@@ -5,41 +5,11 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
 
-import {
-  Container,
-  TextField,
-  Button,
-  Link as MuiLink,
-  Grid,
-  Typography,
-  IconButton,
-} from "@material-ui/core"
+import { Button, Container, Grid, Link as MuiLink, TextField, Typography } from "@material-ui/core"
 
-import { X as CloseIcon } from "react-feather"
-
+import CloserNavbar from "../components/CloserNavbar"
 import { auth } from "../firebase.utils"
-import Navbar from "../components/Navbar"
-
 import { ReactComponent as Logo } from "../assets/logo.svg"
-
-function RegisterNavbar() {
-  return (
-    <Navbar maxWidth="xs">
-      <Grid container direction="column" alignItems="center" justifyContent="center">
-        <Grid item style={{ position: "absolute", alignSelf: "flex-start" }}>
-          <IconButton>
-            <Link href="/splash">
-              <CloseIcon color="white" size={24} />
-            </Link>
-          </IconButton>
-        </Grid>
-        <Grid item>
-          <Typography variant="h5">Registrarse</Typography>
-        </Grid>
-      </Grid>
-    </Navbar>
-  )
-}
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -70,7 +40,7 @@ function Register() {
 
   return (
     <Container maxWidth="xs">
-      <RegisterNavbar />
+      <CloserNavbar href="/splash" title="Registrarse" />
 
       <Grid container direction="column" alignItems="center" spacing={1}>
         <Grid item>
