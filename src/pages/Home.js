@@ -36,6 +36,8 @@ function GroupedDocuments({ title, documents, limit, groupBy }) {
   // if limit is undefined then take all documents
   const limitedDocuments = documents.slice(0, limit)
 
+  const href = `/seeGroup/${title}?groupBy=${groupBy}`
+
   return (
     <div>
       {/*-- Mini header --*/}
@@ -52,6 +54,13 @@ function GroupedDocuments({ title, documents, limit, groupBy }) {
 
       {/*-- Documents Rows --*/}
       <DocumentsRows documents={limitedDocuments} />
+      <div style={{ marginTop: 8, width: "100%", display: "flex", justifyContent: "center" }}>
+        <Link href={href}>
+          <Typography variant="link_sm">
+            {documents.length > limit ? `Ver los ${documents.length} documentos` : null}
+          </Typography>
+        </Link>
+      </div>
     </div>
   )
 }
