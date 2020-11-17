@@ -24,7 +24,8 @@ import {
 import Navbar from "../components/Navbar"
 import DocumentsRows from "../components/DocumentsRows"
 
-import { useGetGroupedDocuments, useUserData } from "../hooks/useDocuments"
+import useUserData from "../hooks/useUserData"
+import { useGetGroupedDocuments } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 
 import { auth } from "../firebase.utils"
@@ -43,7 +44,7 @@ function GroupedDocuments({ title, documents, limit, groupBy }) {
           <Typography variant="h5">{title}</Typography>
         </Grid>
         <Grid item>
-          <Link href={`/seeGroup/${title}?groupBy=${groupBy}`}>
+          <Link href={href}>
             <Typography variant="link_sm">Ver todos</Typography>
           </Link>
         </Grid>
@@ -113,7 +114,7 @@ function Documents() {
       {/*-- Grouped Documents list --*/}
       <Grid container direction="column" spacing={6}>
         {documentGroups?.map((documents) => (
-          <Grid item key={documentGroups.title}>
+          <Grid item key={documents.title}>
             <GroupedDocuments
               title={documents.title}
               documents={documents.data}

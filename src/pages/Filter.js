@@ -4,9 +4,9 @@ import { useLocation } from "wouter"
 import { Button, Chip, Container, Grid, Typography } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 
-import { useUserData } from "../hooks/useDocuments"
-import { editUserDataFilters } from "../utils/user.firebase"
+import useUserData from "../hooks/useUserData"
 import CloserNavbar from "../components/CloserNavbar"
+import { editUserDataFilters } from "../utils/user.firebase"
 
 const useStyles = makeStyles(() => ({
   selectedChip: {

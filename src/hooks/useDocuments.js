@@ -1,8 +1,8 @@
-import { useAuthState } from "react-firebase-hooks/auth"
 import { format } from "date-fns"
-
-import { auth, firestore } from "../firebase.utils"
 import { useDocumentData } from "react-firebase-hooks/firestore"
+
+import { firestore } from "../firebase.utils"
+import useUserData from "./useUserData"
 
 const fromFirestoreUserDocument = (document) => ({
   ...document,
@@ -15,19 +15,6 @@ const fromFirestoreDocument = (document) => ({
   orderDate: document.orderDate.toDate(),
   orderDisplayDate: format(document.orderDate.toDate(), "dd/MM/yyyy"),
 })
-
-export function useUserData() {
-  const [user] = useAuthState(auth)
-
-  const [userData, loading, error] = useDocumentData(
-    user?.uid ? firestore.collection("users").doc(user.uid) : undefined,
-    {
-      idField: "id",
-    }
-  )
-
-  return [userData, loading || !userData, error]
-}
 
 export function useGetAllDocuments() {
   const [userData, loading, error] = useUserData()
@@ -69,6 +56,8 @@ const groupByValues = ["schoolName", "responsable", "displayDate", null]
 
 const orderByValues = ["asc", "desc", null]
 
+const toNumber = (value, defaultValue = 0) => (!isNaN(value) ? value : defaultValue)
+
 export function useGetGroupedDocuments({ groupBy: groupByKey, orderBy = "asc" }) {
   const [documents, loading, error] = useGetAllDocuments()
 
@@ -85,11 +74,16 @@ export function useGetGroupedDocuments({ groupBy: groupByKey, orderBy = "asc" })
   // grouping the documents
   const groupedDocuments = object2KeyValueArray(groupBy(documents, groupByKey), "title", "data")
 
-  // sorting the documents
+  // sorting the document groups
   groupedDocuments.sort((a, b) => b.title.localeCompare(a.title))
 
   // if not ascendant order, then its descendent
   if (orderBy !== "asc") groupedDocuments.reverse()
+
+  // sorting the individual documents
+  groupedDocuments.forEach((group) =>
+    group.data.sort((a, b) => toNumber(b.number) - toNumber(a.number))
+  )
 
   return [groupedDocuments, loading, error]
 }

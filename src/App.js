@@ -17,6 +17,7 @@ import Snackbar from "@material-ui/core/Snackbar"
 import { ErrorProvider, useError } from "./hooks/useError"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth } from "./firebase.utils"
+import { UserDataProvider } from "./hooks/useUserData"
 
 function ErrorPopup() {
   const { message } = useError()
@@ -73,19 +74,21 @@ function Route({ authOnly, loginOnly, ...rest }) {
 function App() {
   return (
     <ErrorProvider>
-      <Switch>
-        <Route authOnly path="/" component={Home} />
-        <Route authOnly path="/search" component={Search} />
-        <Route authOnly path="/filter" component={Filter} />
-        <Route authOnly path="/seeGroup/:title" component={SeeGroup} />
-        <Route authOnly path="/document/:id" component={Document} />
+      <UserDataProvider>
+        <Switch>
+          <Route authOnly path="/" component={Home} />
+          <Route authOnly path="/search" component={Search} />
+          <Route authOnly path="/filter" component={Filter} />
+          <Route authOnly path="/seeGroup/:title" component={SeeGroup} />
+          <Route authOnly path="/document/:id" component={Document} />
 
-        <Route loginOnly path="/splash" component={Splash} />
-        <Route loginOnly path="/login" component={Login} />
-        <Route loginOnly path="/register" component={Register} />
+          <Route loginOnly path="/splash" component={Splash} />
+          <Route loginOnly path="/login" component={Login} />
+          <Route loginOnly path="/register" component={Register} />
 
-        <Route component={NotFound} />
-      </Switch>
+          <Route component={NotFound} />
+        </Switch>
+      </UserDataProvider>
       <ErrorPopup />
     </ErrorProvider>
   )
