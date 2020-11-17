@@ -18,7 +18,7 @@ import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
 import Navbar from "../components/Navbar"
-import { deleteDocument, updateDocument } from "../utils/documents.firebase"
+import { defaultDocumentValues, deleteDocument, updateDocument } from "../utils/documents.firebase"
 
 const hideIfEmpty = (cellData) => {
   if (!cellData) {
@@ -71,23 +71,24 @@ function DocumentDetails({
   const { register, errors, formState, getValues, reset, control, setValue, watch } = useForm({
     mode: "onChange",
     defaultValues: {
-      orderNumber: initialData.orderNumber,
-      schoolName: initialData.schoolName,
-      schoolAddress: initialData.schoolAddress,
-      schoolDepartment: initialData.schoolDepartment,
-      schoolProvince: initialData.schoolProvince,
-      schoolDistrict: initialData.schoolDistrict,
-      schoolRUC: initialData.schoolRUC,
-      schoolTelephone: initialData.schoolTelephone,
-      schoolCellphone: initialData.schoolCellphone,
-      responsableName: initialData.responsableName,
-      responsablePosition: initialData.responsablePosition,
-      responsableEmail: initialData.responsableEmail,
-      orderDate: initialData.orderDate,
-      inicialOrders: initialData.inicialOrders,
-      primariaOrders: initialData.primariaOrders,
-      secundariaOrders: initialData.secundariaOrders,
-      otrosOrders: initialData.otrosOrders,
+      orderNumber: initialData.orderNumber ?? defaultDocumentValues.orderNumber,
+      orderDate: initialData.orderDate ?? defaultDocumentValues.orderDate,
+      schoolName: initialData.schoolName ?? defaultDocumentValues.schoolName,
+      schoolAddress: initialData.schoolAddress ?? defaultDocumentValues.schoolAddress,
+      schoolDepartment: initialData.schoolDepartment ?? defaultDocumentValues.schoolDepartment,
+      schoolProvince: initialData.schoolProvince ?? defaultDocumentValues.schoolProvince,
+      schoolDistrict: initialData.schoolDistrict ?? defaultDocumentValues.schoolDistrict,
+      schoolRUC: initialData.schoolRUC ?? defaultDocumentValues.schoolRUC,
+      schoolTelephone: initialData.schoolTelephone ?? defaultDocumentValues.schoolTelephone,
+      schoolCellphone: initialData.schoolCellphone ?? defaultDocumentValues.schoolCellphone,
+      responsableName: initialData.responsableName ?? defaultDocumentValues.responsableName,
+      responsablePosition:
+        initialData.responsablePosition ?? defaultDocumentValues.responsablePosition,
+      responsableEmail: initialData.responsableEmail ?? defaultDocumentValues.responsableEmail,
+      inicialOrders: initialData.inicialOrders ?? defaultDocumentValues.inicialOrders,
+      primariaOrders: initialData.primariaOrders ?? defaultDocumentValues.primariaOrders,
+      secundariaOrders: initialData.secundariaOrders ?? defaultDocumentValues.secundariaOrders,
+      otrosOrders: initialData.otrosOrders ?? defaultDocumentValues.otrosOrders,
     },
   })
 
