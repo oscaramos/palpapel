@@ -2,7 +2,7 @@ import { useAuthState } from "react-firebase-hooks/auth"
 import { format } from "date-fns"
 
 import { auth, firestore } from "../firebase.utils"
-import { useDocumentDataOnce } from "react-firebase-hooks/firestore"
+import { useDocumentData } from "react-firebase-hooks/firestore"
 
 const fromFirestoreUserDocument = (document) => ({
   ...document,
@@ -19,7 +19,7 @@ const fromFirestoreDocument = (document) => ({
 export function useUserData() {
   const [user] = useAuthState(auth)
 
-  const [userData, loading, error] = useDocumentDataOnce(
+  const [userData, loading, error] = useDocumentData(
     user?.uid ? firestore.collection("users").doc(user.uid) : undefined,
     {
       idField: "id",
@@ -44,7 +44,7 @@ export function useGetAllDocuments() {
 }
 
 export function useGetDocument(id) {
-  const [rawDocument, loading, error] = useDocumentDataOnce(
+  const [rawDocument, loading, error] = useDocumentData(
     firestore.collection("orders").doc(id || " "),
     {
       idField: "id",

@@ -18,7 +18,7 @@ import { useError } from "../hooks/useError"
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
 import Navbar from "../components/Navbar"
-import { deleteDocument, editDocument } from "../utils/documents.firebase"
+import { deleteDocument, updateDocument } from "../utils/documents.firebase"
 
 const hideIfEmpty = (cellData) => {
   if (!cellData) {
@@ -664,7 +664,7 @@ function Document({ params }) {
   }
 
   const handleEdit = (data) => {
-    editDocument(id, data)
+    updateDocument(id, data)
     setIsClickedEdit(false)
   }
 

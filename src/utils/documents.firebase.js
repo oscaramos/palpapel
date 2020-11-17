@@ -1,3 +1,4 @@
+import admin from "firebase/app"
 import { auth, firestore } from "../firebase.utils"
 
 export const createDocument = async () => {
@@ -275,12 +276,53 @@ export const createDocument = async () => {
   })
 }
 
-export const editDocument = async (id, data) => {
+const order2UserOrder = (order) => ({
+  schoolName: order.schoolName,
+  date: order.orderDate,
+  id: order.id,
+  number: order.orderNumber,
+  responsable: order.responsableName,
+})
+
+/**
+ * Update the document on the orders collection and also creates an entry to the user's personal documents
+ * @param id
+ * @param data
+ * @return {Promise<void>}
+ */
+export const updateDocument = async (id, data) => {
+  // batch to keep the whole operation atomic
+  const batch = firestore.batch()
+
   const docRef = firestore.collection("orders").doc(id)
-  await docRef.update(data)
+  await batch.update(docRef, data)
+
+  const updatedOrders = {}
+  updatedOrders[`orders.${id}`] = order2UserOrder({ ...data, id })
+
+  const userRef = firestore.collection("users").doc(auth.currentUser.uid)
+  await batch.update(userRef, updatedOrders)
+
+  await batch.commit()
 }
 
+/**
+ * Deletes the document on the orders collection and also deletes their correspondent entry on the user's personal documents
+ * @param id
+ * @return {Promise<void>}
+ */
 export const deleteDocument = async (id) => {
+  // batch to keep the whole operation atomic
+  const batch = firestore.batch()
+
   const docRef = firestore.collection("orders").doc(id)
-  await docRef.delete()
+  await batch.delete(docRef)
+
+  const orderToDelete = {}
+  orderToDelete[`orders.${id}`] = admin.firestore.FieldValue.delete()
+
+  const userRef = firestore.collection("users").doc(auth.currentUser.uid)
+  await batch.update(userRef, orderToDelete)
+
+  await batch.commit()
 }
