@@ -279,7 +279,6 @@ export const createDocument = async () => {
 const order2UserOrder = (order) => ({
   schoolName: order.schoolName,
   date: order.orderDate,
-  id: order.id,
   number: order.orderNumber,
   responsable: order.responsableName,
 })
@@ -298,7 +297,7 @@ export const updateDocument = async (id, data) => {
   await batch.update(docRef, data)
 
   const updatedOrders = {}
-  updatedOrders[`orders.${id}`] = order2UserOrder({ ...data, id })
+  updatedOrders[`orders.${id}`] = order2UserOrder(data)
 
   const userRef = firestore.collection("users").doc(auth.currentUser.uid)
   await batch.update(userRef, updatedOrders)
