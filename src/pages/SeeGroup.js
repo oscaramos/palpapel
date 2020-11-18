@@ -26,7 +26,7 @@ function SeeGroup({ params }) {
       throwError(error.message)
       setLocation("/")
     }
-  }, [error, throwError])
+  }, [error, throwError, setLocation])
 
   const group = documentGroups?.find((group) => group.title === title)
 
