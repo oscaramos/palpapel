@@ -1,8 +1,9 @@
 import { format } from "date-fns"
 import { useDocumentData } from "react-firebase-hooks/firestore"
 
-import { firestore } from "../firebase.utils"
+import { auth, firestore } from "../firebase.utils"
 import useUserData from "./useUserData"
+import { defaultFilters, groupByValues, orderByValues } from "./useFilters"
 
 const fromFirestoreUserDocument = (document) => ({
   ...document,
@@ -21,8 +22,16 @@ export function useGetAllDocuments() {
 
   if (!userData) return [null, loading, error]
 
+  const orders = userData?.orders
+
+  if (userData && !orders) {
+    // Create new empty orders for user
+    firestore.collection("users").doc(auth.currentUser.uid).update({ orders: {} })
+    return [null, loading, error]
+  }
+
   // convert each order from firestore format to internal format + add it it's id
-  const documents = Object.entries(userData.orders).map(([id, order]) => ({
+  const documents = Object.entries(orders).map(([id, order]) => ({
     ...fromFirestoreUserDocument(order),
     id,
   }))
@@ -52,16 +61,15 @@ const groupBy = (xs, key) =>
 const object2KeyValueArray = (obj, keyName, valueName) =>
   Object.entries(obj).map(([key, value]) => ({ [keyName]: key, [valueName]: value }))
 
-const groupByValues = ["schoolName", "responsable", "displayDate", null]
-
-const orderByValues = ["asc", "desc", null]
-
 const toNumber = (value, defaultValue = 0) => (!isNaN(value) ? value : defaultValue)
 
-export function useGetGroupedDocuments({ groupBy: groupByKey, orderBy = "asc" }) {
+export function useGetGroupedDocuments(filters) {
   const [documents, loading, error] = useGetAllDocuments()
 
   // validation
+  if (!filters) return [null, true, null]
+
+  const { groupBy: groupByKey = defaultFilters.groupBy, orderBy = defaultFilters.orderBy } = filters
   if (!groupByValues.includes(groupByKey)) {
     return [null, false, { message: "El parámetro groupBy es invalido" }]
   }

@@ -1,23 +1,28 @@
 import React, { createContext, useContext } from "react"
 
 import { useAuthState } from "react-firebase-hooks/auth"
-import { useDocumentData } from "react-firebase-hooks/firestore"
+import { useDocument } from "react-firebase-hooks/firestore"
 import { auth, firestore } from "../firebase.utils"
 
 const UserDataContext = createContext(undefined)
 
 export function UserDataProvider({ children }) {
   const [user] = useAuthState(auth)
+  const uid = user?.uid
 
-  const [userData, loading, error] = useDocumentData(
-    user?.uid ? firestore.collection("users").doc(user.uid) : undefined,
+  const [userDataSnap, loading, error] = useDocument(
+    uid ? firestore.collection("users").doc(uid) : undefined,
     {
       idField: "id",
     }
   )
 
+  if (userDataSnap && !userDataSnap.exists) {
+    firestore.collection("users").doc(uid).set({})
+  }
+
   return (
-    <UserDataContext.Provider value={[userData, loading || !userData, error]}>
+    <UserDataContext.Provider value={[userDataSnap?.data(), loading, error]}>
       {children}
     </UserDataContext.Provider>
   )
