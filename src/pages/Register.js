@@ -10,12 +10,16 @@ import CloserNavbar from "../components/CloserNavbar"
 import { auth } from "../firebase.utils"
 import { ReactComponent as Logo } from "../assets/logo.svg"
 
+const registerUser = (data) => {
+  auth.createUserWithEmailAndPassword(data.email, data.password)
+}
+
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup.string().required().min(8, "password should be at least 8 characters"),
+  password: yup.string().required().min(8, "Las contraseña tiene que tener al menos 8 caracteres"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Passwords does not match")
+    .oneOf([yup.ref("password")], "Las contraseña no son iguales")
     .required(),
 })
 
@@ -24,10 +28,6 @@ function Register() {
     resolver: yupResolver(schema),
     mode: "onChange",
   })
-
-  const registerUser = (data) => {
-    auth.createUserWithEmailAndPassword(data.email, data.password)
-  }
 
   return (
     <Container maxWidth="xs">

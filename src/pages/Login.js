@@ -14,7 +14,7 @@ import { ReactComponent as Logo } from "../assets/logo.svg"
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup.string().required().min(8, "password should be at least 8 characters"),
+  password: yup.string().required().min(8, "Las contraseña tiene que tener al menos 8 caracteres"),
 })
 
 function Login() {
@@ -27,11 +27,11 @@ function Login() {
   const loginUser = (data) => {
     auth.signInWithEmailAndPassword(data.email, data.password).catch((error) => {
       if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-        throwError("The email address or password are wrong")
+        throwError("El correo o la contraseña están mal")
       } else if (error.code === "auth/too-many-requests") {
-        throwError("Too many attempts")
+        throwError("Demasiados intentos, espere un rato")
       } else {
-        throwError("Unknown error")
+        throwError("Error desconocido")
       }
     })
   }
