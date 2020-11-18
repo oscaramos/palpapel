@@ -24,7 +24,7 @@ import {
 import Navbar from "../components/Navbar"
 import DocumentsRows from "../components/DocumentsRows"
 
-import useUserData from "../hooks/useUserData"
+import useFilters, { groupByToSpanish } from "../hooks/useFilters"
 import { useGetGroupedDocuments } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 
@@ -80,15 +80,11 @@ const useDocumentsStyles = makeStyles((theme) => ({
   },
 }))
 
-const defaultFilters = { groupBy: null, orderBy: null }
-
 function Documents() {
   const classes = useDocumentsStyles()
-  const [userData] = useUserData()
-
-  const filters = userData?.filters ?? defaultFilters
+  const [filters] = useFilters()
   const [documentGroups, loading, error] = useGetGroupedDocuments(filters)
-  const { groupBy } = filters
+  const { groupBy } = filters ?? { groupBy: null, orderBy: null }
 
   const { throwError } = useError()
 
@@ -103,7 +99,7 @@ function Documents() {
       {/*-- Filter Navbar --*/}
       <Grid container direction="row" justifyContent="space-between">
         <Grid item>
-          <Typography variant="h3">Colegio</Typography>
+          <Typography variant="h3">{groupByToSpanish(filters?.groupBy)}</Typography>
         </Grid>
         <Grid item>
           <Link href="/filter">

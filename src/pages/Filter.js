@@ -4,7 +4,7 @@ import { useLocation } from "wouter"
 import { Button, Chip, Container, Grid, Typography } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 
-import useUserData from "../hooks/useUserData"
+import useFilters from "../hooks/useFilters"
 import CloserNavbar from "../components/CloserNavbar"
 import { editUserDataFilters } from "../utils/user.firebase"
 
@@ -106,7 +106,7 @@ function FilterWithData({ filterData, onEdit, clickedEdit }) {
 
 function Filter() {
   const [, setLocation] = useLocation()
-  const [userData, loading, error] = useUserData()
+  const [filters, loading, error] = useFilters()
   const [clickedEdit, setClickedEdit] = useState(false)
 
   const handleEdit = (data) => {
@@ -123,11 +123,7 @@ function Filter() {
       ) : error ? (
         "error!"
       ) : (
-        <FilterWithData
-          filterData={userData.filters}
-          onEdit={handleEdit}
-          clickedEdit={clickedEdit}
-        />
+        <FilterWithData filterData={filters} onEdit={handleEdit} clickedEdit={clickedEdit} />
       )}
 
       <Button
