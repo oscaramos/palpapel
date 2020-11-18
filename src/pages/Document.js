@@ -11,7 +11,11 @@ import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers"
 
 import { Button, Container, Grid, IconButton, TextField, Typography } from "@material-ui/core"
 
-import { ChevronLeft as ArrowLeftIcon, Printer as PrintIcon, Save as SaveIcon } from "react-feather"
+import {
+  ChevronLeft as ArrowLeftIcon,
+  Download as DownloadIcon,
+  Save as SaveIcon,
+} from "react-feather"
 
 import { useGetDocument } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
@@ -59,6 +63,12 @@ const toFirebaseData = (formData) => {
   }
 }
 
+const errorHelperText = {
+  schoolRUC: "El RUC debe contener hasta 11 dígitos",
+  schoolTelephone: "El teléfono debe contener hasta 6 dígitos",
+  schoolCellphone: "El celular debe contener hasta 9 dígitos",
+}
+
 function DocumentDetails({
   initialData,
   onIsValidForm,
@@ -94,6 +104,8 @@ function DocumentDetails({
 
   const { isValid, isDirty } = formState
 
+  const { throwError } = useError()
+
   const inicialOrders = watch("inicialOrders")
   const primariaOrders = watch("primariaOrders")
   const secundariaOrders = watch("secundariaOrders")
@@ -128,6 +140,18 @@ function DocumentDetails({
     }
   }, [isClickedEdit, getFirebaseData, onEdit, getValues, reset])
 
+  useEffect(() => {
+    if (!isValid) {
+      let message = null
+      message = errors.schoolRUC ? errorHelperText.schoolRUC : message
+      message = !message && errors.schoolTelephone ? errorHelperText.schoolTelephone : message
+      message = !message && errors.schoolCellphone ? errorHelperText.schoolCellphone : message
+
+      if (!message) return
+      throwError(message)
+    }
+  }, [onIsValidForm, isValid, errors, throwError])
+
   // Events listeners for parent component
   useEffect(() => {
     onIsValidForm(isValid)
@@ -140,7 +164,9 @@ function DocumentDetails({
   // When unmounting then save data to firestore
   useUnmount(
     ([getFirebaseData]) => {
-      onEdit(getFirebaseData())
+      if (isValid) {
+        onEdit(getFirebaseData())
+      }
     },
     [getFirebaseData]
   )
@@ -241,9 +267,7 @@ function DocumentDetails({
                 name="schoolRUC"
                 inputRef={register({ maxLength: 11 })}
                 error={Boolean(errors.schoolRUC)}
-                helperText={
-                  Boolean(errors.schoolRUC) ? "El RUC debe contener hasta 11 dígitos" : null
-                }
+                helperText={Boolean(errors.schoolRUC) ? errorHelperText.schoolRUC : null}
                 fullWidth
               />
             </Grid>
@@ -256,9 +280,7 @@ function DocumentDetails({
                 inputRef={register({ maxLength: 6 })}
                 error={Boolean(errors.schoolTelephone)}
                 helperText={
-                  Boolean(errors.schoolTelephone)
-                    ? "El teléfono debe contener hasta 6 dígitos"
-                    : null
+                  Boolean(errors.schoolTelephone) ? errorHelperText.schoolTelephone : null
                 }
                 fullWidth
               />
@@ -272,9 +294,7 @@ function DocumentDetails({
                 inputRef={register({ maxLength: 9 })}
                 error={Boolean(errors.schoolCellphone)}
                 helperText={
-                  Boolean(errors.schoolCellphone)
-                    ? "El celular debe contener hasta 9 dígitos"
-                    : null
+                  Boolean(errors.schoolCellphone) ? errorHelperText.schoolCellphone : null
                 }
                 fullWidth
               />
@@ -502,7 +522,7 @@ const saveFile = (filename, blob) => {
   }, 0)
 }
 
-const downloadFile = async (data) => {
+const downloadFile = async (data, filename) => {
   // Read template file
   const resp = await fetch("/template.docx")
   const templateFile = await resp.blob()
@@ -512,7 +532,7 @@ const downloadFile = async (data) => {
   const doc = await handler.process(templateFile, data)
 
   // Save output
-  saveFile("output.docx", doc)
+  saveFile(filename, doc)
 }
 
 const toDocumentData = (data) => {
@@ -622,7 +642,7 @@ function DocumentNavbar({ onClickPrint, onClickEdit, disableEdit, disablePrint }
             </Grid>
             <Grid item>
               <IconButton onClick={onClickPrint} disabled={disablePrint}>
-                <PrintIcon color={disablePrint ? "#A6A6AA" : "white"} size={24} />
+                <DownloadIcon color={disablePrint ? "#A6A6AA" : "white"} size={24} />
               </IconButton>
             </Grid>
           </Grid>
@@ -660,7 +680,7 @@ function Document({ params }) {
   }, [error, throwError, setLocation])
 
   const handlePrint = (data) => {
-    downloadFile(toDocumentData(data))
+    downloadFile(toDocumentData(data), `orden-${data.orderNumber}.docx`)
     setIsClickedPrint(false)
   }
 

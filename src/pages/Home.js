@@ -30,6 +30,7 @@ import { useError } from "../hooks/useError"
 
 import { auth } from "../firebase.utils"
 import { createDocument } from "../utils/documents.firebase"
+import { ReactComponent as DocumentsIllustration } from "../assets/documents_illustration.svg"
 
 function GroupedDocuments({ title, documents, limit, groupBy }) {
   // take the first x documents
@@ -93,6 +94,20 @@ function Documents() {
       throwError(`Error cargando mis ordenes: ${error.message}`)
     }
   }, [error, throwError])
+
+  // When there are not any document
+  if (documentGroups?.length === 0) {
+    return (
+      <Grid container direction="column" alignItems="center">
+        <Grid item>
+          <DocumentsIllustration />
+        </Grid>
+        <Grid item>
+          <Typography variant="body_lg">Es tiempo de crear un nuevo documento</Typography>
+        </Grid>
+      </Grid>
+    )
+  }
 
   return (
     <div>

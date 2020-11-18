@@ -37,7 +37,7 @@ function SeeGroup({ params }) {
 
   return (
     <Container maxWidth="xs">
-      <CloserNavbar href="/" title="See Group" />
+      <CloserNavbar href="/" title="Ver todo" />
 
       <Typography variant="h3">{title}</Typography>
       <DocumentsRows documents={group?.data} />
