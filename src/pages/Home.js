@@ -159,11 +159,32 @@ const useNavbarStyles = makeStyles(() => ({
   },
 }))
 
-function HomeNavbar({ onOpenMenu, onCreateDocument }) {
+function HomeNavbar() {
   const classes = useNavbarStyles()
+
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [, setLocation] = useLocation()
+
+  const handleCreateDocument = async () => {
+    const res = await createDocument()
+    setLocation(`/document/${res.id}`)
+  }
+
+  const handleClickSignOut = () => {
+    auth.signOut()
+  }
+
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
 
   return (
     <Navbar>
+      {/*-- Navbar --*/}
       <Grid container direction="row" alignItems="center">
         <Grid item style={{ flexGrow: 1 }}>
           <Link href="/search">
@@ -183,57 +204,35 @@ function HomeNavbar({ onOpenMenu, onCreateDocument }) {
             />
           </Link>
         </Grid>
+
         <Grid item style={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}>
-          <IconButton onClick={onCreateDocument}>
+          <IconButton onClick={handleCreateDocument}>
             <PlusCircleIcon color="white" size={24} />
           </IconButton>
-          <IconButton onClick={onOpenMenu}>
+          <IconButton onClick={handleOpenMenu}>
             <MenuIcon color="white" fontSize="large" />
           </IconButton>
         </Grid>
       </Grid>
+
+      {/*-- Menu --*/}
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenu}
+        keepMounted
+      >
+        <MenuItem onClick={handleClickSignOut}>Cerrar sesión</MenuItem>
+      </Menu>
     </Navbar>
   )
 }
 
 function Home() {
-  const [, setLocation] = useLocation()
-
-  const [anchorEl, setAnchorEl] = useState(null)
-
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
-
-  const handleCreateDocument = async () => {
-    const res = await createDocument()
-    setLocation(`/document/${res.id}`)
-  }
-
   return (
     <Container maxWidth="sm">
-      <HomeNavbar onOpenMenu={handleOpenMenu} onCreateDocument={handleCreateDocument} />
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
-        <MenuItem
-          onClick={() => {
-            auth.signOut()
-            handleCloseMenu()
-          }}
-        >
-          Cerrar sesión
-        </MenuItem>
-      </Menu>
-
+      <HomeNavbar />
       <Documents />
     </Container>
   )
