@@ -1,13 +1,37 @@
-import React from "react"
+import React, { useRef } from "react"
 import { createContext, useContext } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, firestore } from "../firebase.utils"
 import { useDocument } from "react-firebase-hooks/firestore"
 import FullPageSpinner from "../components/FullPageSpinner"
 
+const defaultData = {
+  name: "",
+}
+
+const createUser = (uid, data) => {
+  return firestore
+    .collection("users")
+    .doc(uid)
+    .set({ ...defaultData, ...data })
+}
+
+const updateUser = (uid) => {
+  return firestore.collection("users").doc(uid).update(defaultData)
+}
+
+// arr1 - arr2
+const difference = (arr1, arr2) => arr1.filter((x) => !arr2.includes(x))
+
+const hasDifference = (arr1, arr2) => {
+  return difference(arr1, arr2).length > 0
+}
+
 const AuthContext = createContext(undefined)
 
 export function AuthProvider(props) {
+  const userDataFromRegister = useRef({})
+
   const [user, loadingUser] = useAuthState(auth)
   const isSignedIn = !!user
 
@@ -16,14 +40,22 @@ export function AuthProvider(props) {
   )
 
   const loadingUserDocument = !userDataSnap
+  const userDocument = userDataSnap?.data()
 
-  const userWithoutDocument = isSignedIn && !loadingUserDocument && !userDataSnap.exists
+  const userDocumentIsComplete =
+    !loadingUserDocument &&
+    userDocument &&
+    !hasDifference(Object.keys(defaultData), Object.keys(userDocument))
 
-  if (userWithoutDocument) {
-    firestore.collection("users").doc(user.uid).set({})
+  if (isSignedIn && !loadingUserDocument) {
+    if (!userDataSnap.exists) {
+      createUser(user.uid, userDataFromRegister.current)
+    } else if (!userDocumentIsComplete) {
+      updateUser(user.uid)
+    }
   }
 
-  const loading = loadingUser || (isSignedIn && (loadingUserDocument || userWithoutDocument))
+  const loading = loadingUser || (isSignedIn && (loadingUserDocument || !userDocumentIsComplete))
 
   if (loading) {
     return <FullPageSpinner />
@@ -31,7 +63,7 @@ export function AuthProvider(props) {
 
   const data = isSignedIn
     ? {
-        ...userDataSnap.data(),
+        ...userDocument,
         uid: user.uid,
       }
     : null
@@ -40,8 +72,11 @@ export function AuthProvider(props) {
     return auth.signInWithEmailAndPassword(email, password)
   }
 
-  const register = (email, password) => {
-    return auth.createUserWithEmailAndPassword(email, password)
+  const register = async (name, email, password) => {
+    userDataFromRegister.current = {
+      name,
+    }
+    return await auth.createUserWithEmailAndPassword(email, password)
   }
 
   const logout = () => {

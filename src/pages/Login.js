@@ -13,8 +13,11 @@ import { useAuth } from "../hooks/useAuth"
 import { ReactComponent as Logo } from "../assets/logo.svg"
 
 const schema = yup.object().shape({
-  email: yup.string().email().required(),
-  password: yup.string().required().min(8, "Las contraseña tiene que tener al menos 8 caracteres"),
+  email: yup.string().email().required("El correo es un campo requerido"),
+  password: yup
+    .string()
+    .required("La contraseña es requerida")
+    .min(6, "Las contraseña tiene que tener al menos 6 caracteres"),
 })
 
 function Login() {

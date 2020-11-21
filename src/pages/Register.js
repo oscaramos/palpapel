@@ -13,10 +13,14 @@ import { useError } from "../hooks/useError"
 import { ReactComponent as Logo } from "../assets/logo.svg"
 
 const schema = yup.object().shape({
-  email: yup.string().email().required(),
-  password: yup.string().required().min(8, "Las contraseña tiene que tener al menos 8 caracteres"),
-  confirmPassword: yup
+  name: yup.string().required("El nombre es un campo requerido"),
+  email: yup.string().email().required("El correo es un campo requerido"),
+  password: yup
     .string()
+    .required("La contraseña es requerida")
+    .min(6, "Las contraseña tiene que tener al menos 6 caracteres"),
+  confirmPassword: yup
+    .string("La confirmación de contraseña es requerida")
     .oneOf([yup.ref("password")], "Las contraseña no son iguales")
     .required(),
 })
@@ -34,7 +38,7 @@ function Register() {
 
   const submitHandler = async (data) => {
     try {
-      await registerUser(data.email, data.password)
+      await registerUser(data.name, data.email, data.password)
       setLocation("/")
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
@@ -61,10 +65,21 @@ function Register() {
             <TextField
               variant="outlined"
               margin="normal"
+              label="Nombre"
+              name="name"
+              autoComplete="name"
+              inputRef={register}
+              error={Boolean(errors.name)}
+              helperText={errors?.name?.message}
+              fullWidth
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
               label="Correo Electrónico"
               name="email"
-              inputRef={register}
               autoComplete="email"
+              inputRef={register}
               error={Boolean(errors.email)}
               helperText={errors?.email?.message}
               fullWidth
@@ -75,8 +90,8 @@ function Register() {
               label="Contraseña"
               type="password"
               name="password"
-              inputRef={register}
               autoComplete="current-password"
+              inputRef={register}
               error={Boolean(errors.password)}
               helperText={errors?.password?.message}
               fullWidth
