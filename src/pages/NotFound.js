@@ -1,11 +1,15 @@
 import React from "react"
-import Container from "@material-ui/core/Container"
-import Typography from "@material-ui/core/Typography"
-import Button from "@material-ui/core/Button"
 import { Link } from "wouter"
-import Grid from "@material-ui/core/Grid"
+
+import { Typography, Container, Button, Grid } from "@material-ui/core"
+
+import useUser from "../hooks/useUser"
 
 function NotFound() {
+  const user = useUser()
+
+  const href = user ? "/" : "/splash"
+
   return (
     <Container maxWidth="xs">
       <Grid
@@ -22,7 +26,7 @@ function NotFound() {
           <Typography variant="body_lg">La página que busca no existe</Typography>
         </Grid>
         <Grid item container style={{ marginTop: 24 }}>
-          <Link href="/">
+          <Link href={href}>
             <Button variant="contained" fullWidth>
               Volver a Casa
             </Button>

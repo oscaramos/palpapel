@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react"
+import MaterialTable from "material-table"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
-import MaterialTable from "material-table"
 import { useForm, Controller } from "react-hook-form"
 import { useUnmount } from "react-useunmount"
 
@@ -684,22 +684,14 @@ function Document({ params }) {
     setIsClickedPrint(false)
   }
 
-  const handleEdit = (data) => {
-    updateDocument(id, data)
+  const handleEdit = async (data) => {
+    await updateDocument(id, data)
     setIsClickedEdit(false)
   }
 
-  const handleDelete = () => {
-    deleteDocument(id)
+  const handleDelete = async () => {
+    await deleteDocument(id)
     setLocation("/")
-  }
-
-  const handleIsValidForm = (valid) => {
-    setIsValidForm(valid)
-  }
-
-  const handleIsDirtyForm = (dirty) => {
-    setIsDirtyForm(dirty)
   }
 
   return (
@@ -715,8 +707,8 @@ function Document({ params }) {
         <DocumentDetails
           initialData={initialData}
           loading={loading}
-          onIsValidForm={handleIsValidForm}
-          onIsDirtyForm={handleIsDirtyForm}
+          onIsValidForm={(valid) => setIsValidForm(valid)}
+          onIsDirtyForm={(dirty) => setIsDirtyForm(dirty)}
           isClickedPrint={isClickedPrint}
           isClickedEdit={isClickedEdit}
           onPrint={handlePrint}
