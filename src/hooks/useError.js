@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react"
+import { ErrorSnack } from "../components/ErrorSnack"
 
 const ErrorContext = createContext(undefined)
 
@@ -9,7 +10,12 @@ export function ErrorProvider({ children }) {
     setMessage(message)
   }
 
-  return <ErrorContext.Provider value={{ message, throwError }}>{children}</ErrorContext.Provider>
+  return (
+    <ErrorContext.Provider value={{ message, throwError }}>
+      {children}
+      <ErrorSnack />
+    </ErrorContext.Provider>
+  )
 }
 
 export function useError() {
