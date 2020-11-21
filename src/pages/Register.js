@@ -1,18 +1,16 @@
 import React from "react"
-import { Link } from "wouter"
-import { useForm } from "react-hook-form"
 import * as yup from "yup"
+import { Link, useLocation } from "wouter"
+import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 import { Button, Container, Grid, Link as MuiLink, TextField, Typography } from "@material-ui/core"
 
 import CloserNavbar from "../components/CloserNavbar"
-import { auth } from "../firebase.utils"
-import { ReactComponent as Logo } from "../assets/logo.svg"
+import { useAuth } from "../hooks/useAuth"
+import { useError } from "../hooks/useError"
 
-const registerUser = (data) => {
-  auth.createUserWithEmailAndPassword(data.email, data.password)
-}
+import { ReactComponent as Logo } from "../assets/logo.svg"
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -24,10 +22,30 @@ const schema = yup.object().shape({
 })
 
 function Register() {
+  const [, setLocation] = useLocation()
+  const { register: registerUser } = useAuth()
+
   const { register, errors, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   })
+
+  const { throwError } = useError()
+
+  const submitHandler = async (data) => {
+    try {
+      await registerUser(data.email, data.password)
+      setLocation("/")
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        throwError("El correo ya esta en uso en otra cuenta")
+      } else if (error.code === "auth/too-many-requests") {
+        throwError("Demasiados intentos, espere un rato")
+      } else {
+        throwError(error.message)
+      }
+    }
+  }
 
   return (
     <Container maxWidth="xs">
@@ -39,7 +57,7 @@ function Register() {
         </Grid>
 
         <Grid item>
-          <form onSubmit={handleSubmit(registerUser)}>
+          <form onSubmit={handleSubmit(submitHandler)}>
             <TextField
               variant="outlined"
               margin="normal"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useLocation } from "wouter"
 
 import { Button, Chip, Container, Grid, Typography } from "@material-ui/core"
@@ -45,18 +45,16 @@ function Pill({ selected, children, ...rest }) {
   return <Chip label={children} className={classes.unselectedChip} clickable={false} {...rest} />
 }
 
-function FilterWithData({ filterData, onEdit, clickedEdit }) {
-  const [groupBy, setGroupBy] = useState(filterData.groupBy)
-  const [orderBy, setOrderBy] = useState(filterData.orderBy)
+function FilterWithData({ filters, onEdit }) {
+  const [groupBy, setGroupBy] = useState(filters.groupBy)
+  const [orderBy, setOrderBy] = useState(filters.orderBy)
 
-  useEffect(() => {
-    if (clickedEdit) {
-      onEdit({
-        groupBy,
-        orderBy,
-      })
-    }
-  }, [clickedEdit, onEdit, groupBy, orderBy])
+  const handleClickEdit = () => {
+    onEdit({
+      groupBy,
+      orderBy,
+    })
+  }
 
   return (
     <Grid container direction="column" spacing={6}>
@@ -100,40 +98,29 @@ function FilterWithData({ filterData, onEdit, clickedEdit }) {
           </Grid>
         </Grid>
       </Grid>
+
+      <Grid item>
+        <Button variant="contained" style={{ marginTop: 48 }} onClick={handleClickEdit} fullWidth>
+          Mostrar resultados
+        </Button>
+      </Grid>
     </Grid>
   )
 }
 
 function Filter() {
   const [, setLocation] = useLocation()
-  const [filters, loading, error] = useFilters()
-  const [clickedEdit, setClickedEdit] = useState(false)
+  const filters = useFilters()
 
-  const handleEdit = (data) => {
-    editUserDataFilters(data)
+  const handleEdit = async (data) => {
+    await editUserDataFilters(data)
     setLocation("/")
   }
 
   return (
     <Container maxWidth="xs">
       <CloserNavbar href="/" title="Filtros" />
-
-      {loading ? (
-        "cargando..."
-      ) : error ? (
-        "error!"
-      ) : (
-        <FilterWithData filterData={filters} onEdit={handleEdit} clickedEdit={clickedEdit} />
-      )}
-
-      <Button
-        variant="contained"
-        style={{ marginTop: 48 }}
-        onClick={() => setClickedEdit(true)}
-        fullWidth
-      >
-        Mostrar resultados
-      </Button>
+      <FilterWithData filters={filters} onEdit={handleEdit} />
     </Container>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Link, useLocation } from "wouter"
 
 import {
@@ -26,13 +26,12 @@ import DocumentsRows from "../components/DocumentsRows"
 
 import useFilters, { groupByToSpanish } from "../hooks/useFilters"
 import { useGetGroupedDocuments } from "../hooks/useDocuments"
-import { useError } from "../hooks/useError"
-
-import { auth } from "../firebase.utils"
+import { useAuth } from "../hooks/useAuth"
 import { createDocument } from "../utils/documents.firebase"
+
 import { ReactComponent as DocumentsIllustration } from "../assets/documents_illustration.svg"
 
-function GroupedDocuments({ title, documents, limit, groupBy }) {
+function GroupedDocuments({ title, documents, groupBy, limit }) {
   // take the first x documents
   // if limit is undefined then take all documents
   const limitedDocuments = documents.slice(0, limit)
@@ -83,20 +82,14 @@ const useDocumentsStyles = makeStyles((theme) => ({
 
 function Documents() {
   const classes = useDocumentsStyles()
-  const [filters] = useFilters()
-  const [documentGroups, loading, error] = useGetGroupedDocuments(filters)
-  const { groupBy } = filters ?? { groupBy: null, orderBy: null }
 
-  const { throwError } = useError()
+  const filters = useFilters()
+  const { groupBy } = filters
 
-  useEffect(() => {
-    if (error) {
-      throwError(`Error cargando mis ordenes: ${error.message}`)
-    }
-  }, [error, throwError])
+  const documentGroups = useGetGroupedDocuments(filters)
 
   // When there are not any document
-  if (documentGroups?.length === 0) {
+  if (documentGroups.length === 0) {
     return (
       <Grid container direction="column" alignItems="center">
         <Grid item>
@@ -114,7 +107,7 @@ function Documents() {
       {/*-- Filter Navbar --*/}
       <Grid container direction="row" justifyContent="space-between">
         <Grid item>
-          <Typography variant="h3">{groupByToSpanish(filters?.groupBy)}</Typography>
+          <Typography variant="h3">{groupByToSpanish(filters.groupBy)}</Typography>
         </Grid>
         <Grid item>
           <Link href="/filter">
@@ -133,14 +126,13 @@ function Documents() {
 
       {/*-- Grouped Documents list --*/}
       <Grid container direction="column" spacing={6}>
-        {documentGroups?.map((documents) => (
+        {documentGroups.map((documents) => (
           <Grid item key={documents.title}>
             <GroupedDocuments
               title={documents.title}
               documents={documents.data}
-              loading={loading}
-              limit={5}
               groupBy={groupBy}
+              limit={5}
             />
           </Grid>
         ))}
@@ -164,14 +156,16 @@ function HomeNavbar() {
 
   const [anchorEl, setAnchorEl] = useState(null)
   const [, setLocation] = useLocation()
+  const { logout } = useAuth()
 
   const handleCreateDocument = async () => {
     const res = await createDocument()
     setLocation(`/document/${res.id}`)
   }
 
-  const handleClickSignOut = () => {
-    auth.signOut()
+  const handleClickSignOut = async () => {
+    await logout()
+    setLocation("/splash")
   }
 
   const handleOpenMenu = (event) => {

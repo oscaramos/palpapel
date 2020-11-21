@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
+import { Link } from "wouter"
 
+import { makeStyles } from "@material-ui/core/styles"
 import { Container, Grid, IconButton, TextField, Typography } from "@material-ui/core"
-
 import { ChevronLeft as ArrowLeftIcon } from "react-feather"
 
 import DocumentCard from "../components/DocumentCard"
-import { useGetAllDocuments } from "../hooks/useDocuments"
-import { useError } from "../hooks/useError"
 import Navbar from "../components/Navbar"
-import { makeStyles } from "@material-ui/core/styles"
-import { Link } from "wouter"
+
+import { useGetAllDocuments } from "../hooks/useDocuments"
 
 const useNavbarStyles = makeStyles(() => ({
   inputPlaceholder: {
@@ -57,18 +56,11 @@ function SearchNavbar({ search, setSearch }) {
 }
 
 function Search() {
-  const [documents, , error] = useGetAllDocuments()
-  const { throwError } = useError()
-
   const [search, setSearch] = useState("")
 
-  useEffect(() => {
-    if (error) {
-      throwError("Error loading my orders")
-    }
-  }, [error, throwError])
+  const documents = useGetAllDocuments()
 
-  const filteredDocuments = documents?.filter((document) => document.number.includes(search))
+  const filteredDocuments = documents.filter((document) => document.number.includes(search))
 
   return (
     <Container maxWidth="sm">
@@ -79,7 +71,7 @@ function Search() {
           <Typography variant="h3">Resultados</Typography>
 
           <div style={{ marginTop: 16 }}>
-            {filteredDocuments?.map((document) => (
+            {filteredDocuments.map((document) => (
               <Grid item key={document.id}>
                 <DocumentCard
                   id={document.id}

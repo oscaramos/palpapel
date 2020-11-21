@@ -1,9 +1,9 @@
-import useUserData from "./useUserData"
-import { auth, firestore } from "../firebase.utils"
+import useUser from "./useUser"
+import { firestore } from "../firebase.utils"
 
-export const groupByValues = ["schoolName", "responsable", "displayDate", null]
+export const groupByValues = ["schoolName", "responsable", "displayDate"]
 
-export const orderByValues = ["asc", "desc", null]
+export const orderByValues = ["asc", "desc"]
 
 export const defaultFilters = {
   groupBy: "schoolName",
@@ -21,18 +21,16 @@ export function groupByToSpanish(groupBy) {
 }
 
 function useFilters() {
-  const [userData, loading, error] = useUserData()
+  const { filters, uid } = useUser()
 
-  const filters = userData?.filters
-
-  if (userData && !filters) {
+  if (!filters) {
     // Create new empty orders for user
-    firestore.collection("users").doc(auth.currentUser.uid).update({ filters: defaultFilters })
+    firestore.collection("users").doc(uid).update({ filters: defaultFilters })
 
-    return [defaultFilters, loading, error]
+    return defaultFilters
   }
 
-  return [filters, loading, error]
+  return filters
 }
 
 export default useFilters

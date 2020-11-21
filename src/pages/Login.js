@@ -1,14 +1,14 @@
 import React from "react"
 import * as yup from "yup"
-import { Link } from "wouter"
+import { Link, useLocation } from "wouter"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 
 import { Button, Container, Grid, Link as MuiLink, TextField, Typography } from "@material-ui/core"
 
 import CloserNavbar from "../components/CloserNavbar"
-import { auth } from "../firebase.utils"
 import { useError } from "../hooks/useError"
+import { useAuth } from "../hooks/useAuth"
 
 import { ReactComponent as Logo } from "../assets/logo.svg"
 
@@ -18,22 +18,28 @@ const schema = yup.object().shape({
 })
 
 function Login() {
+  const [, setLocation] = useLocation()
+  const { login } = useAuth()
+
   const { register, errors, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   })
   const { throwError } = useError()
 
-  const loginUser = (data) => {
-    auth.signInWithEmailAndPassword(data.email, data.password).catch((error) => {
+  const loginUser = async (data) => {
+    try {
+      await login(data.email, data.password)
+      setLocation("/")
+    } catch (error) {
       if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
         throwError("El correo o la contraseña están mal")
       } else if (error.code === "auth/too-many-requests") {
         throwError("Demasiados intentos, espere un rato")
       } else {
-        throwError("Error desconocido")
+        throwError(error.message)
       }
-    })
+    }
   }
 
   return (

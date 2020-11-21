@@ -2,6 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 import CssBaseline from "@material-ui/core/CssBaseline"
 import { ThemeProvider } from "@material-ui/core/styles"
+import { AppProviders } from "./AppProviders"
 
 import App from "./App"
 import theme from "./theme"
@@ -10,7 +11,9 @@ import * as serviceWorker from "./serviceWorker"
 ReactDOM.render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
-    <App />
+    <AppProviders>
+      <App />
+    </AppProviders>
   </ThemeProvider>,
   document.getElementById("root")
 )
