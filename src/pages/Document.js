@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react"
-import MaterialTable from "material-table"
+import React, { useEffect, useState } from "react"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
 import { useForm, Controller } from "react-hook-form"
@@ -26,40 +25,12 @@ import {
 
 import Navbar from "../components/Navbar"
 import ReactHookFormSelect from "../components/ReackHookFormSelect"
+import Table from "../components/Table/Table"
 import { useGetDocument } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
 
-import tableIcons from "../utils/tableIcons"
-import tableLocalization from "../utils/tableLocalization"
 import { defaultDocumentValues, deleteDocument, updateDocument } from "../utils/documents.firebase"
 import { toDisplayDate } from "../utils/date"
-
-const hideIfEmpty = (cellData) => {
-  if (!cellData) {
-    return {
-      color: "transparent",
-    }
-  }
-}
-
-const convertCountsToNumbers = (documents) =>
-  documents.map((document) =>
-    Object.fromEntries(
-      Object.entries(document).map(([key, val]) =>
-        key.startsWith("count") ? [key, Number(val)] : [key, val]
-      )
-    )
-  )
-
-const toFirebaseData = (formData) => {
-  return {
-    ...formData,
-    inicialOrders: convertCountsToNumbers(formData.inicialOrders),
-    primariaOrders: convertCountsToNumbers(formData.primariaOrders),
-    secundariaOrders: convertCountsToNumbers(formData.secundariaOrders),
-    otrosOrders: convertCountsToNumbers(formData.otrosOrders),
-  }
-}
 
 const getDefaultValues = (initialData) => {
   // check if every field(key) of defaultDocumentValues exists in initialData(from firestore)
@@ -89,6 +60,41 @@ function Separator() {
   )
 }
 
+const inicialColumns = [
+  { name: "Titulo", key: "name", editable: true, width: 200 },
+  { name: "Editorial", key: "editorial", editable: true, width: 100 },
+  { name: "2 años", key: "count2", editable: true, width: 75, type: "number" },
+  { name: "3 años", key: "count3", editable: true, width: 75, type: "number" },
+  { name: "4 años", key: "count4", editable: true, width: 75, type: "number" },
+  { name: "5 años", key: "count5", editable: true, width: 75, type: "number" },
+]
+
+const primariaColumns = [
+  { name: "Titulo", key: "name", editable: true, width: 200 },
+  { name: "Editorial", key: "editorial", editable: true, width: 100 },
+  { name: "1ero", key: "count1", editable: true, width: 50, type: "number" },
+  { name: "2do", key: "count2", editable: true, width: 50, type: "number" },
+  { name: "3ero", key: "count3", editable: true, width: 50, type: "number" },
+  { name: "4to", key: "count4", editable: true, width: 50, type: "number" },
+  { name: "5to", key: "count5", editable: true, width: 50, type: "number" },
+  { name: "6to", key: "count6", editable: true, width: 50, type: "number" },
+]
+
+const secundariaColumns = [
+  { name: "Titulo", key: "name", editable: true, width: 200 },
+  { name: "Editorial", key: "editorial", editable: true, width: 100 },
+  { name: "1ero", key: "count1", editable: true, width: 50, type: "number" },
+  { name: "2do", key: "count2", editable: true, width: 50, type: "number" },
+  { name: "3ero", key: "count3", editable: true, width: 50, type: "number" },
+  { name: "4to", key: "count4", editable: true, width: 50, type: "number" },
+  { name: "5to", key: "count5", editable: true, width: 50, type: "number" },
+]
+
+const otrosColumns = [
+  { name: "Titulo", key: "name", editable: true, width: 300 },
+  { name: "Cantidad", key: "count", editable: true, width: 235, type: "number" },
+]
+
 function DocumentDetails({
   initialData,
   onIsValidForm,
@@ -112,10 +118,6 @@ function DocumentDetails({
   const secundariaOrders = watch("secundariaOrders")
   const otrosOrders = watch("otrosOrders")
 
-  const getFirebaseData = useCallback(() => {
-    return toFirebaseData(getValues())
-  }, [getValues])
-
   // Register tables to react-hook-form
   useEffect(() => {
     register("inicialOrders")
@@ -127,19 +129,19 @@ function DocumentDetails({
   // Print the saved data
   useEffect(() => {
     if (isClickedPrint) {
-      onPrint(getFirebaseData())
+      onPrint(getValues())
     }
-  }, [isClickedPrint, getFirebaseData, onPrint])
+  }, [isClickedPrint, getValues, onPrint])
 
   // Edit the saved data
   useEffect(() => {
     if (isClickedEdit) {
       // Editing the saved data
-      onEdit(getFirebaseData())
+      onEdit(getValues())
       // Reset isDirtyForm with current data to disable save button
       reset(getValues())
     }
-  }, [isClickedEdit, getFirebaseData, onEdit, getValues, reset])
+  }, [isClickedEdit, getValues, onEdit, getValues, reset])
 
   useEffect(() => {
     if (!isValid) {
@@ -355,31 +357,12 @@ function DocumentDetails({
           </Grid>
           <Grid item container direction="column" spacing={2}>
             <Grid item>
-              <MaterialTable
-                columns={[
-                  { title: "Titulo", field: "name" },
-                  { title: "Editorial", field: "editorial" },
-                  { title: "2 años", field: "count2", align: "right", cellStyle: hideIfEmpty },
-                  { title: "3 años", field: "count3", align: "right", cellStyle: hideIfEmpty },
-                  { title: "4 años", field: "count4", align: "right", cellStyle: hideIfEmpty },
-                  { title: "5 años", field: "count5", align: "right", cellStyle: hideIfEmpty },
-                ]}
-                data={inicialOrders}
-                editable={{
-                  onRowUpdate: async (newData, oldData) => {
-                    const dataUpdate = [...inicialOrders]
-                    const index = oldData.tableData.id
-                    dataUpdate[index] = newData
-                    setValue("inicialOrders", [...dataUpdate], { shouldDirty: true })
-                  },
+              <Table
+                columns={inicialColumns}
+                initialRows={inicialOrders}
+                onChange={(rows) => {
+                  setValue("inicialOrders", rows, { shouldDirty: true })
                 }}
-                options={{
-                  toolbar: false,
-                  paging: false,
-                  sorting: false,
-                }}
-                icons={tableIcons}
-                localization={tableLocalization}
               />
             </Grid>
           </Grid>
@@ -392,36 +375,12 @@ function DocumentDetails({
           </Grid>
           <Grid item container direction="column" spacing={2}>
             <Grid item>
-              <MaterialTable
-                style={{
-                  width: "100%",
+              <Table
+                columns={primariaColumns}
+                initialRows={primariaOrders}
+                onChange={(rows) => {
+                  setValue("primariaOrders", rows, { shouldDirty: true })
                 }}
-                columns={[
-                  { title: "Titulo", field: "name" },
-                  { title: "Editorial", field: "editorial" },
-                  { title: "1ero", field: "count1", align: "right", cellStyle: hideIfEmpty },
-                  { title: "2do", field: "count2", align: "right", cellStyle: hideIfEmpty },
-                  { title: "3ero", field: "count3", align: "right", cellStyle: hideIfEmpty },
-                  { title: "4to", field: "count4", align: "right", cellStyle: hideIfEmpty },
-                  { title: "5to", field: "count5", align: "right", cellStyle: hideIfEmpty },
-                  { title: "6to", field: "count6", align: "right", cellStyle: hideIfEmpty },
-                ]}
-                data={primariaOrders}
-                editable={{
-                  onRowUpdate: async (newData, oldData) => {
-                    const dataUpdate = [...primariaOrders]
-                    const index = oldData.tableData.id
-                    dataUpdate[index] = newData
-                    setValue("primariaOrders", [...dataUpdate], { shouldDirty: true })
-                  },
-                }}
-                options={{
-                  toolbar: false,
-                  paging: false,
-                  sorting: false,
-                }}
-                icons={tableIcons}
-                localization={tableLocalization}
               />
             </Grid>
           </Grid>
@@ -434,35 +393,12 @@ function DocumentDetails({
           </Grid>
           <Grid item container direction="column" spacing={2}>
             <Grid item>
-              <MaterialTable
-                style={{
-                  width: "100%",
+              <Table
+                columns={secundariaColumns}
+                initialRows={secundariaOrders}
+                onChange={(rows) => {
+                  setValue("secundariaOrders", rows, { shouldDirty: true })
                 }}
-                columns={[
-                  { title: "Titulo", field: "name" },
-                  { title: "Editorial", field: "editorial" },
-                  { title: "1ero", field: "count1", align: "right", cellStyle: hideIfEmpty },
-                  { title: "2do", field: "count2", align: "right", cellStyle: hideIfEmpty },
-                  { title: "3ero", field: "count3", align: "right", cellStyle: hideIfEmpty },
-                  { title: "4to", field: "count4", align: "right", cellStyle: hideIfEmpty },
-                  { title: "5to", field: "count5", align: "right", cellStyle: hideIfEmpty },
-                ]}
-                data={secundariaOrders}
-                editable={{
-                  onRowUpdate: async (newData, oldData) => {
-                    const dataUpdate = [...secundariaOrders]
-                    const index = oldData.tableData.id
-                    dataUpdate[index] = newData
-                    setValue("secundariaOrders", [...dataUpdate], { shouldDirty: true })
-                  },
-                }}
-                options={{
-                  toolbar: false,
-                  paging: false,
-                  sorting: false,
-                }}
-                icons={tableIcons}
-                localization={tableLocalization}
               />
             </Grid>
           </Grid>
@@ -475,30 +411,12 @@ function DocumentDetails({
           </Grid>
           <Grid item container direction="column" spacing={2}>
             <Grid item>
-              <MaterialTable
-                style={{
-                  width: "100%",
+              <Table
+                columns={otrosColumns}
+                initialRows={otrosOrders}
+                onChange={(rows) => {
+                  setValue("otrosOrders", rows, { shouldDirty: true })
                 }}
-                columns={[
-                  { title: "Titulo", field: "name" },
-                  { title: "Cantidad", field: "count", align: "right", cellStyle: hideIfEmpty },
-                ]}
-                data={otrosOrders}
-                editable={{
-                  onRowUpdate: async (newData, oldData) => {
-                    const dataUpdate = [...otrosOrders]
-                    const index = oldData.tableData.id
-                    dataUpdate[index] = newData
-                    setValue("otrosOrders", [...dataUpdate], { shouldDirty: true })
-                  },
-                }}
-                options={{
-                  toolbar: false,
-                  paging: false,
-                  sorting: false,
-                }}
-                icons={tableIcons}
-                localization={tableLocalization}
               />
             </Grid>
           </Grid>
