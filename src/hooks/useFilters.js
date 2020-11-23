@@ -1,5 +1,5 @@
 import useUser from "./useUser"
-import { firestore } from "../firebase.utils"
+import { firestore } from "../utils/firebase.utils"
 
 export const groupByValues = ["schoolName", "responsable", "displayDate"]
 

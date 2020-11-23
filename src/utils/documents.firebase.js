@@ -1,20 +1,23 @@
 import admin from "firebase/app"
-import { auth, firestore } from "../firebase.utils"
+import { auth, firestore } from "./firebase.utils"
 
 export const defaultDocumentValues = {
   orderDate: new Date(),
   orderNumber: "000000",
+
   schoolName: "",
+  schoolRUC: "",
+  schoolDirector: "",
+  schoolTelephone: "",
   schoolAddress: "",
   schoolDepartment: "",
   schoolProvince: "",
   schoolDistrict: "",
-  schoolRUC: "",
-  schoolTelephone: "",
-  schoolCellphone: "",
+
   responsableName: "",
-  responsablePosition: "",
   responsableEmail: "",
+  salesMethod: "venta_directa",
+
   inicialOrders: [
     {
       name: "",
@@ -178,42 +181,8 @@ export const defaultDocumentValues = {
       count4: 0,
       count5: 0,
     },
-    {
-      name: "",
-      editorial: "",
-      count1: 0,
-      count2: 0,
-      count3: 0,
-      count4: 0,
-      count5: 0,
-    },
-    {
-      name: "",
-      editorial: "",
-      count1: 0,
-      count2: 0,
-      count3: 0,
-      count4: 0,
-      count5: 0,
-    },
   ],
   otrosOrders: [
-    {
-      name: "",
-      count: 0,
-    },
-    {
-      name: "",
-      count: 0,
-    },
-    {
-      name: "",
-      count: 0,
-    },
-    {
-      name: "",
-      count: 0,
-    },
     {
       name: "",
       count: 0,

@@ -4,8 +4,9 @@ import { useLocation } from "wouter"
 import { Button, Chip, Container, Grid, Typography } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 
-import useFilters from "../hooks/useFilters"
 import CloserNavbar from "../components/CloserNavbar"
+import useFilters from "../hooks/useFilters"
+import useUser from "../hooks/useUser"
 import { editUserDataFilters } from "../utils/user.firebase"
 
 const useStyles = makeStyles(() => ({
@@ -109,11 +110,12 @@ function FilterWithData({ filters, onEdit }) {
 }
 
 function Filter() {
-  const [, setLocation] = useLocation()
   const filters = useFilters()
+  const { uid } = useUser()
+  const [, setLocation] = useLocation()
 
   const handleEdit = async (data) => {
-    await editUserDataFilters(data)
+    await editUserDataFilters(uid, data)
     setLocation("/")
   }
 
