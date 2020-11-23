@@ -1,7 +1,7 @@
 import React, { useRef } from "react"
 import { createContext, useContext } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
-import { auth, firestore } from "../firebase.utils"
+import { auth, firestore } from "../utils/firebase.utils"
 import { useDocument } from "react-firebase-hooks/firestore"
 import FullPageSpinner from "../components/FullPageSpinner"
 
