@@ -1,20 +1,21 @@
-import { format } from "date-fns"
 import { useDocumentData } from "react-firebase-hooks/firestore"
 
 import useUser from "./useUser"
 import { defaultFilters, groupByValues, orderByValues } from "./useFilters"
-import { firestore } from "../firebase.utils"
+
+import { firestore } from "../utils/firebase.utils"
+import { toDisplayDate } from "../utils/date"
 
 const fromFirestoreUserDocument = (document) => ({
   ...document,
   date: document.date.toDate(),
-  displayDate: format(document.date.toDate(), "dd/MM/yyyy"),
+  displayDate: toDisplayDate(document.date.toDate()),
 })
 
 const fromFirestoreDocument = (document) => ({
   ...document,
   orderDate: document.orderDate.toDate(),
-  orderDisplayDate: format(document.orderDate.toDate(), "dd/MM/yyyy"),
+  orderDisplayDate: toDisplayDate(document.orderDate.toDate()),
 })
 
 export function useGetAllDocuments() {
