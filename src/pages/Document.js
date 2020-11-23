@@ -3,13 +3,20 @@ import MaterialTable from "material-table"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
 import { useForm, Controller } from "react-hook-form"
-import { useUnmount } from "react-useunmount"
 
 import DateFnsUtils from "@date-io/date-fns"
 import esLocale from "date-fns/locale/es"
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers"
 
-import { Button, Container, Grid, IconButton, TextField, Typography } from "@material-ui/core"
+import {
+  Button,
+  Container,
+  Grid,
+  IconButton,
+  TextField,
+  Typography,
+  MenuItem,
+} from "@material-ui/core"
 
 import {
   ChevronLeft as ArrowLeftIcon,
@@ -17,12 +24,15 @@ import {
   Save as SaveIcon,
 } from "react-feather"
 
+import Navbar from "../components/Navbar"
+import ReactHookFormSelect from "../components/ReackHookFormSelect"
 import { useGetDocument } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
+
 import tableIcons from "../utils/tableIcons"
 import tableLocalization from "../utils/tableLocalization"
-import Navbar from "../components/Navbar"
 import { defaultDocumentValues, deleteDocument, updateDocument } from "../utils/documents.firebase"
+import { toDisplayDate } from "../utils/date"
 
 const hideIfEmpty = (cellData) => {
   if (!cellData) {
@@ -43,19 +53,7 @@ const convertCountsToNumbers = (documents) =>
 
 const toFirebaseData = (formData) => {
   return {
-    orderNumber: formData.orderNumber,
-    orderDate: formData.orderDate,
-    schoolName: formData.schoolName,
-    schoolAddress: formData.schoolAddress,
-    schoolDepartment: formData.schoolDepartment,
-    schoolProvince: formData.schoolProvince,
-    schoolDistrict: formData.schoolDistrict,
-    schoolRUC: formData.schoolRUC,
-    schoolTelephone: formData.schoolTelephone,
-    schoolCellphone: formData.schoolCellphone,
-    responsableName: formData.responsableName,
-    responsablePosition: formData.responsablePosition,
-    responsableEmail: formData.responsableEmail,
+    ...formData,
     inicialOrders: convertCountsToNumbers(formData.inicialOrders),
     primariaOrders: convertCountsToNumbers(formData.primariaOrders),
     secundariaOrders: convertCountsToNumbers(formData.secundariaOrders),
@@ -63,10 +61,32 @@ const toFirebaseData = (formData) => {
   }
 }
 
+const getDefaultValues = (initialData) => {
+  // check if every field(key) of defaultDocumentValues exists in initialData(from firestore)
+  // If it exists, then user initialData, otherwise use defaultValue
+  return Object.fromEntries(
+    Object.entries(defaultDocumentValues).map(([key, defaultValue]) => [
+      key,
+      key in initialData ? initialData[key] : defaultValue,
+    ])
+  )
+}
+
 const errorHelperText = {
   schoolRUC: "El RUC debe contener hasta 11 dígitos",
   schoolTelephone: "El teléfono debe contener hasta 6 dígitos",
-  schoolCellphone: "El celular debe contener hasta 9 dígitos",
+}
+
+function Separator() {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: 2,
+        backgroundColor: "#CBCBD4",
+      }}
+    />
+  )
 }
 
 function DocumentDetails({
@@ -80,26 +100,7 @@ function DocumentDetails({
 }) {
   const { register, errors, formState, getValues, reset, control, setValue, watch } = useForm({
     mode: "onChange",
-    defaultValues: {
-      orderNumber: initialData.orderNumber ?? defaultDocumentValues.orderNumber,
-      orderDate: initialData.orderDate ?? defaultDocumentValues.orderDate,
-      schoolName: initialData.schoolName ?? defaultDocumentValues.schoolName,
-      schoolAddress: initialData.schoolAddress ?? defaultDocumentValues.schoolAddress,
-      schoolDepartment: initialData.schoolDepartment ?? defaultDocumentValues.schoolDepartment,
-      schoolProvince: initialData.schoolProvince ?? defaultDocumentValues.schoolProvince,
-      schoolDistrict: initialData.schoolDistrict ?? defaultDocumentValues.schoolDistrict,
-      schoolRUC: initialData.schoolRUC ?? defaultDocumentValues.schoolRUC,
-      schoolTelephone: initialData.schoolTelephone ?? defaultDocumentValues.schoolTelephone,
-      schoolCellphone: initialData.schoolCellphone ?? defaultDocumentValues.schoolCellphone,
-      responsableName: initialData.responsableName ?? defaultDocumentValues.responsableName,
-      responsablePosition:
-        initialData.responsablePosition ?? defaultDocumentValues.responsablePosition,
-      responsableEmail: initialData.responsableEmail ?? defaultDocumentValues.responsableEmail,
-      inicialOrders: initialData.inicialOrders ?? defaultDocumentValues.inicialOrders,
-      primariaOrders: initialData.primariaOrders ?? defaultDocumentValues.primariaOrders,
-      secundariaOrders: initialData.secundariaOrders ?? defaultDocumentValues.secundariaOrders,
-      otrosOrders: initialData.otrosOrders ?? defaultDocumentValues.otrosOrders,
-    },
+    defaultValues: getDefaultValues(initialData),
   })
 
   const { isValid, isDirty } = formState
@@ -145,7 +146,6 @@ function DocumentDetails({
       let message = null
       message = errors.schoolRUC ? errorHelperText.schoolRUC : message
       message = !message && errors.schoolTelephone ? errorHelperText.schoolTelephone : message
-      message = !message && errors.schoolCellphone ? errorHelperText.schoolCellphone : message
 
       if (!message) return
       throwError(message)
@@ -162,14 +162,14 @@ function DocumentDetails({
   }, [onIsDirtyForm, isDirty])
 
   // When unmounting then save data to firestore
-  useUnmount(
-    ([getFirebaseData]) => {
-      if (isValid) {
-        onEdit(getFirebaseData())
-      }
-    },
-    [getFirebaseData]
-  )
+  // useUnmount(
+  //   ([getFirebaseData]) => {
+  //     if (isValid) {
+  //       onEdit(getFirebaseData())
+  //     }
+  //   },
+  //   [getFirebaseData]
+  // )
 
   return (
     <form>
@@ -189,6 +189,7 @@ function DocumentDetails({
                 fullWidth
               />
             </Grid>
+
             <Grid item>
               <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
                 <Controller
@@ -218,6 +219,46 @@ function DocumentDetails({
                 inputRef={register}
                 fullWidth
               />
+            </Grid>
+
+            <Grid item>
+              <TextField
+                variant="outlined"
+                label="RUC"
+                name="schoolRUC"
+                inputRef={register({ maxLength: 11 })}
+                error={Boolean(errors.schoolRUC)}
+                helperText={Boolean(errors.schoolRUC) ? errorHelperText.schoolRUC : null}
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item>
+              <TextField
+                variant="outlined"
+                label="Director"
+                name="schoolDirector"
+                inputRef={register}
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item>
+              <TextField
+                variant="outlined"
+                label="Teléfono fijo"
+                name="schoolTelephone"
+                inputRef={register({ maxLength: 6 })}
+                error={Boolean(errors.schoolTelephone)}
+                helperText={
+                  Boolean(errors.schoolTelephone) ? errorHelperText.schoolTelephone : null
+                }
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item>
+              <Separator />
             </Grid>
 
             <Grid item>
@@ -259,69 +300,20 @@ function DocumentDetails({
                 fullWidth
               />
             </Grid>
-
-            <Grid item>
-              <TextField
-                variant="outlined"
-                label="RUC"
-                name="schoolRUC"
-                inputRef={register({ maxLength: 11 })}
-                error={Boolean(errors.schoolRUC)}
-                helperText={Boolean(errors.schoolRUC) ? errorHelperText.schoolRUC : null}
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item>
-              <TextField
-                variant="outlined"
-                label="Teléfono fijo"
-                name="schoolTelephone"
-                inputRef={register({ maxLength: 6 })}
-                error={Boolean(errors.schoolTelephone)}
-                helperText={
-                  Boolean(errors.schoolTelephone) ? errorHelperText.schoolTelephone : null
-                }
-                fullWidth
-              />
-            </Grid>
-
-            <Grid item>
-              <TextField
-                variant="outlined"
-                label="Celular"
-                name="schoolCellphone"
-                inputRef={register({ maxLength: 9 })}
-                error={Boolean(errors.schoolCellphone)}
-                helperText={
-                  Boolean(errors.schoolCellphone) ? errorHelperText.schoolCellphone : null
-                }
-                fullWidth
-              />
-            </Grid>
           </Grid>
         </Grid>
 
         {/*-- Responsable --*/}
         <Grid item container direction="column" spacing={2}>
           <Grid item>
-            <Typography variant="h4">Responsable</Typography>
+            <Typography variant="h4">Recepción</Typography>
           </Grid>
           <Grid item container direction="column" spacing={2}>
             <Grid item>
               <TextField
                 variant="outlined"
-                label="Nombre"
+                label="Responsable"
                 name="responsableName"
-                inputRef={register}
-                fullWidth
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                variant="outlined"
-                label="Cargo"
-                name="responsablePosition"
                 inputRef={register}
                 fullWidth
               />
@@ -335,6 +327,23 @@ function DocumentDetails({
                 inputRef={register}
                 fullWidth
               />
+            </Grid>
+
+            <Grid item>
+              <ReactHookFormSelect
+                id="salesMethod"
+                name="salesMethod"
+                label="Método de Venta"
+                control={control}
+                variant="outlined"
+                fullWidth
+              >
+                <MenuItem value="venta_directa">Venta Directa</MenuItem>
+                <MenuItem value="punto_de_venta">Punto de Venta</MenuItem>
+                <MenuItem value="libreria">Librería</MenuItem>
+                <MenuItem value="distribuidor">Distribuidor</MenuItem>
+                <MenuItem value="feria">Feria</MenuItem>
+              </ReactHookFormSelect>
             </Grid>
           </Grid>
         </Grid>
@@ -537,61 +546,23 @@ const downloadFile = async (data, filename) => {
 
 const toDocumentData = (data) => {
   return {
-    number: data.orderNumber,
-    dateDay: data.orderDate.getDay(),
-    dateMonth: data.orderDate.getMonth(),
-    dateYear: data.orderDate.getFullYear(),
+    ...data,
+    date: toDisplayDate(data.orderDate),
 
-    school: data.schoolName,
-    address: data.schoolAddress,
-    department: data.department,
-    province: data.province,
-    district: data.district,
+    venta_directa: data.salesMethod === "venta_directa" ? "x" : "",
+    punto_de_venta: data.salesMethod === "punto_de_venta" ? "x" : "",
+    libreria: data.salesMethod === "libreria" ? "x" : "",
+    distribuidor: data.salesMethod === "distribuidor" ? "x" : "",
+    feria: data.salesMethod === "feria" ? "x" : "",
 
-    telephone1: data.schoolTelephone[0],
-    telephone2: data.schoolTelephone[1],
-    telephone3: data.schoolTelephone[2],
-    telephone4: data.schoolTelephone[3],
-    telephone5: data.schoolTelephone[4],
-    telephone6: data.schoolTelephone[5],
-    telephone7: data.schoolTelephone[6],
-    telephone8: data.schoolTelephone[7],
-    telephone9: data.schoolTelephone[8],
-
-    ruc1: data.schoolRUC[0],
-    ruc2: data.schoolRUC[1],
-    ruc3: data.schoolRUC[2],
-    ruc4: data.schoolRUC[3],
-    ruc5: data.schoolRUC[4],
-    ruc6: data.schoolRUC[5],
-    ruc7: data.schoolRUC[6],
-    ruc8: data.schoolRUC[7],
-    ruc9: data.schoolRUC[8],
-    ruc10: data.schoolRUC[9],
-    ruc11: data.schoolRUC[10],
-
-    cellphone1: data.schoolCellphone[0],
-    cellphone2: data.schoolCellphone[1],
-    cellphone3: data.schoolCellphone[2],
-    cellphone4: data.schoolCellphone[3],
-    cellphone5: data.schoolCellphone[4],
-    cellphone6: data.schoolCellphone[5],
-    cellphone7: data.schoolCellphone[6],
-    cellphone8: data.schoolCellphone[7],
-    cellphone9: data.schoolCellphone[8],
-
-    responsableName: data.responsableName,
-    responsablePosition: data.responsablePosition,
-    responsableEmail: data.responsableEmail,
-
-    InicialOrders: data.inicialOrders.map((order) => ({
+    InicialOrders: data.inicialOrders.slice(0, 3).map((order) => ({
       ...order,
       count2: order.count2 || "",
       count3: order.count3 || "",
       count4: order.count4 || "",
       count5: order.count5 || "",
     })),
-    PrimariaOrders: data.primariaOrders.map((order) => ({
+    PrimariaOrders: data.primariaOrders.slice(0, 8).map((order) => ({
       ...order,
       count1: order.count1 || "",
       count2: order.count2 || "",
@@ -600,7 +571,7 @@ const toDocumentData = (data) => {
       count5: order.count5 || "",
       count6: order.count6 || "",
     })),
-    SecundariaOrders: data.secundariaOrders.map((order) => ({
+    SecundariaOrders: data.secundariaOrders.slice(0, 6).map((order) => ({
       ...order,
       count1: order.count1 || "",
       count2: order.count2 || "",
@@ -608,11 +579,11 @@ const toDocumentData = (data) => {
       count4: order.count4 || "",
       count5: order.count5 || "",
     })),
-    OtrosOrders1: data.otrosOrders.slice(0, 9).map((order) => ({
+    OtrosOrders1: data.otrosOrders.slice(0, 7).map((order) => ({
       ...order,
       count: order.count || "",
     })),
-    OtrosOrders2: data.otrosOrders.slice(9, 18).map((order) => ({
+    OtrosOrders2: data.otrosOrders.slice(7, 14).map((order) => ({
       ...order,
       count: order.count || "",
     })),
