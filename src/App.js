@@ -1,7 +1,8 @@
 import React from "react"
-import { Route, Switch } from "wouter"
+import { Redirect, Route, Router, Switch } from "wouter"
 
 import useUser from "./hooks/useUser"
+import { useInterruptibleLocation } from "./hooks/useInterruptibleLocation"
 
 import Home from "./pages/Home"
 import Document from "./pages/Document"
@@ -15,25 +16,32 @@ import NotFound from "./pages/NotFound"
 
 function AuthenticatedApp() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/search" component={Search} />
-      <Route path="/filter" component={Filter} />
-      <Route path="/seeGroup/:title" component={SeeGroup} />
-      <Route path="/document/:id" component={Document} />
-      <Route component={NotFound} />
-    </Switch>
+    <Router hook={useInterruptibleLocation}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/search" component={Search} />
+        <Route path="/filter" component={Filter} />
+        <Route path="/seeGroup/:title" component={SeeGroup} />
+        <Route path="/document/:id" component={Document} />
+        <Route component={NotFound} />
+      </Switch>
+    </Router>
   )
 }
 
 function UnauthenticatedApp() {
   return (
-    <Switch>
-      <Route path="/splash" component={Splash} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route component={NotFound} />
-    </Switch>
+    <Router hook={useInterruptibleLocation}>
+      <Switch>
+        <Route path="/">
+          <Redirect to="/splash" />
+        </Route>
+        <Route path="/splash" component={Splash} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route component={NotFound} />
+      </Switch>
+    </Router>
   )
 }
 

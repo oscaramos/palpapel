@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { TemplateHandler } from "easy-template-x"
 import { Link, useLocation } from "wouter"
 import { useForm, Controller } from "react-hook-form"
@@ -28,6 +28,7 @@ import ReactHookFormSelect from "../components/ReackHookFormSelect"
 import Table from "../components/Table/Table"
 import { useGetDocument } from "../hooks/useDocuments"
 import { useError } from "../hooks/useError"
+import { useInterruptibleLocationMessage } from "../hooks/useInterruptibleLocation"
 
 import { defaultDocumentValues, deleteDocument, updateDocument } from "../utils/documents.firebase"
 import { toDisplayDate } from "../utils/date"
@@ -97,10 +98,10 @@ const otrosColumns = [
 
 function DocumentDetails({
   initialData,
-  onIsValidForm,
-  onIsDirtyForm,
   isClickedPrint,
   isClickedEdit,
+  onIsValidForm,
+  onIsDirtyForm,
   onPrint,
   onEdit,
 }) {
@@ -141,7 +142,7 @@ function DocumentDetails({
       // Reset isDirtyForm with current data to disable save button
       reset(getValues())
     }
-  }, [isClickedEdit, getValues, onEdit, getValues, reset])
+  }, [isClickedEdit, getValues, onEdit, reset])
 
   useEffect(() => {
     if (!isValid) {
@@ -162,16 +163,6 @@ function DocumentDetails({
   useEffect(() => {
     onIsDirtyForm(isDirty)
   }, [onIsDirtyForm, isDirty])
-
-  // When unmounting then save data to firestore
-  // useUnmount(
-  //   ([getFirebaseData]) => {
-  //     if (isValid) {
-  //       onEdit(getFirebaseData())
-  //     }
-  //   },
-  //   [getFirebaseData]
-  // )
 
   return (
     <form>
@@ -545,6 +536,8 @@ function Document({ params }) {
   const { id } = params
 
   const [, setLocation] = useLocation()
+  const { enable, disable } = useInterruptibleLocationMessage()
+
   const { throwError } = useError()
 
   const [initialData, loading, error] = useGetDocument(id)
@@ -553,6 +546,11 @@ function Document({ params }) {
   const [isDirtyForm, setIsDirtyForm] = useState(false)
   const [isClickedPrint, setIsClickedPrint] = useState(false)
   const [isClickedEdit, setIsClickedEdit] = useState(false)
+
+  // when initialData is fetched, show top of the page, not the middle
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [initialData])
 
   useEffect(() => {
     if (!initialData && !loading) {
@@ -583,23 +581,51 @@ function Document({ params }) {
     setLocation("/")
   }
 
+  // When user is leaving page with unsaved data
+  // then block their leaving for saving the data
+  const alertUser = useCallback(
+    (e) => {
+      if (isDirtyForm) {
+        // block their leaving
+        e.preventDefault()
+        e.returnValue = ""
+      }
+    },
+    [isDirtyForm]
+  )
+
+  useEffect(() => {
+    if (isDirtyForm) {
+      enable("Los cambios hechos no han sido guardados, ¿Desea continuar?")
+    } else {
+      disable()
+    }
+  }, [isDirtyForm, enable, disable])
+
+  // from https://medium.com/javascript-in-plain-english/how-to-alert-a-user-before-leaving-a-page-in-react-a2858104ca94
+  useEffect(() => {
+    window.addEventListener("beforeunload", alertUser)
+    return () => {
+      window.removeEventListener("beforeunload", alertUser)
+    }
+  }, [alertUser])
+
   return (
     <Container maxWidth="sm">
       <DocumentNavbar
-        onClickPrint={() => setIsClickedPrint(true)}
         disablePrint={!isValidForm}
         disableEdit={!isValidForm || !isDirtyForm}
+        onClickPrint={() => setIsClickedPrint(true)}
         onClickEdit={() => setIsClickedEdit(true)}
       />
 
       {initialData ? (
         <DocumentDetails
           initialData={initialData}
-          loading={loading}
-          onIsValidForm={(valid) => setIsValidForm(valid)}
-          onIsDirtyForm={(dirty) => setIsDirtyForm(dirty)}
           isClickedPrint={isClickedPrint}
           isClickedEdit={isClickedEdit}
+          onIsValidForm={(valid) => setIsValidForm(valid)}
+          onIsDirtyForm={(dirty) => setIsDirtyForm(dirty)}
           onPrint={handlePrint}
           onEdit={handleEdit}
         />
@@ -610,9 +636,9 @@ function Document({ params }) {
       <Button
         variant="contained"
         color="secondary"
-        fullWidth
         onClick={handleDelete}
         style={{ marginTop: 16, marginBottom: 64 }}
+        fullWidth
       >
         Eliminar
       </Button>
